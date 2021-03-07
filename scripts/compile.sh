@@ -19,5 +19,12 @@ cd $buildFolder
 cmake -DGeant4_DIR=$G4LIB ../
 make
 
+
+# Compile the macro to check if everything works fine+
+
+
+echo "========= COMPILING MACRO ==========="
+./main
+echo "========= END OF COMPILATION ========"
 # Return to the previous folder
 cd ..   
