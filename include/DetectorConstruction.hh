@@ -1,15 +1,15 @@
 
-#ifndef YOURDETECTORCONSTRUCTION_HH
-#define YOURDETECTORCONSTRUCTION_HH
+#ifndef DETECTORCONSTRUCTION_HH
+#define DETECTORCONSTRUCTION_HH
 
 #include "G4VUserDetectorConstruction.hh"
 
 class G4Material;
 
-class YourDetectorConstruction : public G4VUserDetectorConstruction {
+class DetectorConstruction : public G4VUserDetectorConstruction {
 public: 
-   YourDetectorConstruction();
-  ~YourDetectorConstruction();
+   DetectorConstruction();
+  ~DetectorConstruction();
   
   virtual G4VPhysicalVolume* Construct();
   
