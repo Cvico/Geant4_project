@@ -36,9 +36,10 @@ int main() {
     Materials * obj = new Materials();
     importMaterials(obj);
 
-    obj->getListOfElements();
+    
     // Get a list of all the materials included
     // Call the destructor for freeing memory
+    obj->printListOfElements();
     obj->~Materials();
     return 0;
 }

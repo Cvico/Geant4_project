@@ -44,25 +44,28 @@ public:
     //          METHOD DECLARATION         //
     // =================================== //
 
-    // Check pointer validity
-    void checkIfExists(G4Material * mat);
-    void checkIfExists(G4Isotope * iso);
-    void checkIfExists(G4Element * el);
-    // Modify the structure of the different 
-    // available listings
-
     // For materials
     void addMaterial(const G4String matName);
     void addMaterial(G4Material* mat);
     void addElement(G4Element* el);
     void addIsotope(G4Isotope* iso);
 
-    // Obtain listings
-    void getListOfMaterials();
-    void getListOfElements();
-    void getListOfIsotopes();
-    
-  
+
+    // Get methods
+    std::vector<G4Material*> getListOfMaterials();
+    std::vector<G4Element*> getListOfElements();
+    std::vector<G4Isotope*> getListOfIsotopes();
+
+    // Print listings
+    void printListOfMaterials();
+    void printListOfElements();
+    void printListOfIsotopes();
+
+    template <typename G4obj>
+    void printList(std::vector<G4obj*> vec);
+    template <typename G4obj>
+    void checkValidity(G4obj* g4obj);
+
 private:
     std::vector<G4Isotope*> fListOfIsotopes{};
     std::vector<G4Element*> fListOfElements{};
