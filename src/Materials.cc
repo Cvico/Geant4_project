@@ -12,11 +12,11 @@
 
 Materials::Materials(){
     // -- Default constructor implementation
+    // This can be improved using inheritance with 
+    // each class constructor
     std::cout << "[INFO]: DEFAULT CONSTRUCTOR FOR MATERIALS HAS BEEN CALLED" << std::endl;
     std::cout << " ---- Initializing the list of materials:" << std::endl;
     std::cout << " ---- Finished " << std::endl;
-    
-
 }
 
 Materials::Materials(G4String matName){
@@ -108,6 +108,6 @@ void Materials::printList(std::vector<G4obj*> vec){
 template <typename G4obj>
 void Materials::checkValidity(G4obj* g4obj){
     (g4obj != nullptr) ? G4cout << g4obj << G4endl : 
-                         G4cout << g4obj << "is not a valid pointer..." << G4endl;
+                         G4cerr << g4obj << "is not a valid pointer..." << G4endl;
     return;
 }
