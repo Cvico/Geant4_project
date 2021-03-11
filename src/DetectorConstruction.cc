@@ -1,4 +1,8 @@
-
+#include <iostream>
+#include "G4Types.hh"
+#include "globals.hh"
+#include "G4RunManager.hh"
+#include "G4PhysListFactory.hh"
 #include "DetectorConstruction.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
@@ -32,13 +36,6 @@ DetectorConstruction::DetectorConstruction(G4Material* mat, G4double targetThick
 
 DetectorConstruction::~DetectorConstruction(){}
 
-
-void DetectorConstruction::setMaterial(G4Material* mat){
-  // This method is used to change the material
-  // with which the detector is built
-  fTargetMaterial = mat;
-  return;
-}
 
 void DetectorConstruction::buildSolidWorld(){
   buildSolidWorld("solid-world", 0.5*fWorldXsize, 0.5*fWorldYsize, 0.5*fWorldZsize);

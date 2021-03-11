@@ -1,11 +1,16 @@
 #include <iostream>
+#include "G4Types.hh"
+#include "globals.hh"
+#include "G4RunManager.hh"
+#include "G4PhysListFactory.hh"
 #include "DetectorConstruction.hh"
-#include "Materials.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
+#include "Materials.hh"
 #include "G4Box.hh"
-
-
+#include "G4LogicalVolume.hh"
+#include "G4VPhysicalVolume.hh"
+#include "G4PVPlacement.hh"
 // =================================== //
 //      CONSTRUCTOR DEFINITION         //
 // =================================== //
