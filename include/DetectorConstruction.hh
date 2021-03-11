@@ -15,21 +15,28 @@ public:
   ~DetectorConstruction();
 
   // Getters
-  virtual G4VPhysicalVolume* getPhysicalWorld();
+  G4Box* getSolidWorld();
+  G4LogicalVolume* getLogicalWorld();
+  G4VPhysicalVolume* getPhysicalWorld();
   // Setters
-  virtual void setMaterial(G4Material* mat);
+  void setMaterial(G4Material* mat);
 
   // methods to build solid world
-  virtual void buildSolidWorld();
-  virtual void buildSolidWorld(G4String Name, G4double worldXsize, G4double worldYsize, G4double worldZsize);
+  void buildSolidWorld();
+  void buildSolidWorld(G4String Name);
+  void buildSolidWorld(G4String Name, G4double worldXsize, G4double worldYsize, G4double worldZsize);
   // methods to build logical world
-  virtual void buildLogicalWorld();
-  virtual void buildLogicalWorld(G4String Name);
+  void buildLogicalWorld();
+  void buildLogicalWorld(G4String Name);
   // methods to build physical world
-  virtual void buildPhysicalWorld();
-  virtual void buildPhysicalWorld(G4String Name);
+  void buildPhysicalWorld();
+  void buildPhysicalWorld(G4String Name);
   // Don't really understand what this method is thought for
   virtual G4VPhysicalVolume* Construct();
+  virtual G4VPhysicalVolume* Construct(G4String Name);
+  virtual G4VPhysicalVolume* Construct(G4String Name, G4double worldXsize, G4double worldYsize, G4double worldZsize);
+
+
   void checkValidity(G4Material* mat);
   
   

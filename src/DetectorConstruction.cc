@@ -45,6 +45,11 @@ void DetectorConstruction::buildSolidWorld(){
   return;
 }
 
+void DetectorConstruction::buildSolidWorld(G4String Name){
+  buildSolidWorld(Name, fWorldXsize, fWorldYsize, fWorldZsize);
+  return;
+}
+
 void DetectorConstruction::buildSolidWorld(G4String Name, G4double worldXsize, G4double worldYsize, G4double worldZsize){
   fSolidWorld = new G4Box(Name, worldXsize, worldYsize, worldZsize);
   return;
@@ -88,9 +93,35 @@ void DetectorConstruction::buildPhysicalWorld(G4String Name){
 G4VPhysicalVolume* DetectorConstruction::Construct() {
   // This method is used to finally construct the detector
   // once all the required parameters have been defined
+  buildSolidWorld();
+  buildLogicalWorld();
+  buildPhysicalWorld();
   return 0;
 }
 
+G4VPhysicalVolume* DetectorConstruction::Construct(G4String Name) {
+  // This method is used to finally construct the detector
+  // once all the required parameters have been defined
+  buildSolidWorld(Name.append("_solid"));
+  buildLogicalWorld(Name.append("_logic"));
+  buildPhysicalWorld(Name);
+  return 0;
+}
+G4VPhysicalVolume* DetectorConstruction::Construct(G4String Name, G4double WorldXsize, G4double WorldYsize, G4double WorldZsize) {
+  // This method is used to finally construct the detector
+  // once all the required parameters have been defined
+  buildSolidWorld(Name.append("_solid"), WorldXsize, WorldYsize, WorldZsize);
+  buildLogicalWorld(Name.append("_logic"));
+  buildPhysicalWorld(Name);
+  return 0;
+}
+
+G4Box* DetectorConstruction::getSolidWorld(){
+  return fSolidWorld;
+}
+G4LogicalVolume* DetectorConstruction::getLogicalWorld(){
+  return fLogicalWorld;
+}
 G4VPhysicalVolume* DetectorConstruction::getPhysicalWorld(){
   return fPhysicalWorld;
 }

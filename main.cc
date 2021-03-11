@@ -1,6 +1,8 @@
 #include <iostream>
 #include "G4Types.hh"
 #include "globals.hh"
+#include "G4RunManager.hh"
+#include "G4PhysListFactory.hh"
 #include "DetectorConstruction.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
@@ -49,10 +51,18 @@ int main(){
     obj->printListOfElements();
     obj->~Materials();
     */
-    DetectorConstruction * detector = new DetectorConstruction();
-    detector->buildSolidWorld();
-    detector->buildLogicalWorld();
-    detector->buildPhysicalWorld();
-    G4VPhysicalVolume* world = detector->getPhysicalWorld();
-    return 0;
+
+    // initialize the runManager
+    G4RunManager* runManager = new G4RunManager();
+    DetectorConstruction* detector = new DetectorConstruction();
+    detector->Construct("MyWorld");
+    runManager->SetUserInitialization( detector );
+
+    // Create/obtain a Physics List and register it in the Run-Manager
+    G4PhysListFactory physListFactory;
+    const G4String plName = "FTFP_BERT";
+    G4VModularPhysicsList* pl = physListFactory.GetReferencePhysList( plName );
+    runManager->SetUserInitialization( pl ); 
+
+    
 }
