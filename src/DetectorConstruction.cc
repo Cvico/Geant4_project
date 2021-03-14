@@ -48,7 +48,7 @@ void DetectorConstruction::buildSolidWorld(G4String Name){
 }
 
 void DetectorConstruction::buildSolidWorld(G4String Name, G4double worldXsize, G4double worldYsize, G4double worldZsize){
-  fSolidWorld = new G4Box(Name, worldXsize, worldYsize, worldZsize);
+  fBox = new G4Box(Name, worldXsize, worldYsize, worldZsize);
   return;
 }
 
@@ -62,7 +62,7 @@ void DetectorConstruction::buildLogicalWorld(){
 void DetectorConstruction::buildLogicalWorld(G4String Name){
   // This method will be used to build the logical
   // world that is later passed to the physical one
-  fLogicalWorld = new G4LogicalVolume(fSolidWorld, fTargetMaterial, Name);
+  fLogicalVolume = new G4LogicalVolume(fBox, fTargetMaterial, Name);
   return;
 }
 
@@ -77,11 +77,11 @@ void DetectorConstruction::buildPhysicalWorld(){
 void DetectorConstruction::buildPhysicalWorld(G4String Name){
   // This method will be used to build the logical
   // world that is later passed to the physical one
-  fPhysicalWorld = new G4PVPlacement(nullptr, //(no) rotation
+  fPhysicalVolume = new G4PVPlacement(nullptr, //(no) rotation
                                      G4ThreeVector(0., 0., 0.), //translation
-                                     fLogicalWorld, // logical world
                                      Name,  // name
-                                     nullptr,  //Mother volume
+                                     fLogicalVolume, // logical world
+                                     fPhysicalVolume,  //Mother volume
                                      false, // don't care
                                      0); //cpy number
   return;
@@ -113,15 +113,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct(G4String Name, G4double World
   return 0;
 }
 
-G4Box* DetectorConstruction::getSolidWorld(){
-  return fSolidWorld;
-}
-G4LogicalVolume* DetectorConstruction::getLogicalWorld(){
-  return fLogicalWorld;
-}
-G4VPhysicalVolume* DetectorConstruction::getPhysicalWorld(){
-  return fPhysicalWorld;
-}
 
 
 void DetectorConstruction::checkValidity(G4Material* mat){
