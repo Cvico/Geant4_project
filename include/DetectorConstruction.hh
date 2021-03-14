@@ -15,10 +15,9 @@ public:
   ~DetectorConstruction();
 
   // Getters
-  G4Box* getSolidWorld();
-  G4LogicalVolume* getLogicalWorld();
-  G4VPhysicalVolume* getPhysicalWorld();
-
+  G4Box* GetTargetBox(){return fBox;}
+  G4LogicalVolume* GetTargetLogicalVolume(){return fLogicalVolume;}
+  G4VPhysicalVolume* GetTargetPhysicalVolume(){return fPhysicalVolume;}
   G4Material* GetMaterial(){ return fTargetMaterial;};
   G4double GetTargetThickness(){ return fTargetThickness;};
   G4double GetGunXPosition(){ return fGunXPosition;};
@@ -54,9 +53,9 @@ public:
   
 private:
   G4Material* fTargetMaterial;   
-  G4Box*      fSolidWorld;
-  G4LogicalVolume* fLogicalWorld;
-  G4VPhysicalVolume* fPhysicalWorld;
+  G4Box*      fBox;
+  G4LogicalVolume* fLogicalVolume;
+  G4VPhysicalVolume* fPhysicalVolume;
   G4double    fTargetThickness;
 
 

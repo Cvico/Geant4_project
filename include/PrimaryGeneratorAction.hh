@@ -1,43 +1,57 @@
 #ifndef PRIMARYGENERATORACTION_HH
 #define PRIMARYGENERATORACTION_HH
 
-#include "PrimaryGeneratorAction.hh"
-#include <iostream>
-#include "G4Types.hh"
-#include "globals.hh"
-#include "G4RunManager.hh"
-#include "G4PhysListFactory.hh"
-#include "DetectorConstruction.hh"
-#include "G4Material.hh"
-#include "G4NistManager.hh"
-#include "Materials.hh"
-#include "G4Box.hh"
-#include "G4LogicalVolume.hh"
-#include "G4VPhysicalVolume.hh"
-#include "G4PVPlacement.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 
+#include "globals.hh"
+
+// forward declaration
 class DetectorConstruction;
+class G4ParticleGun;
+class G4Event;
+class G4String;
+
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
-public:
+
+  // Method declaration:
+  public:
+    
+    // CTR & DTR
     PrimaryGeneratorAction(DetectorConstruction* det);
-    ~PrimaryGeneratorAction();
+    virtual ~PrimaryGeneratorAction();
 
-    void createParticleGun();
-    void generateParticle();
+    // (Pure) virtual method to generata primary events
+    virtual void   GeneratePrimaries(G4Event*);
 
-    // Getters
-    G4ParticleGun* GetParticleGun() { return fParticleGun;};
-    const G4String& GetParticleName();
+    //
+    // Additional custom methods: 
 
-    // Setters
-    void SetKinematics();
-    void UpdatePosition();
-    virtual void GeneratePrimaries(G4Event* anEvent);
-private:
-    G4ParticleGun* fParticleGun;
-    DetectorConstruction* fDetector;
+    // Public method to obtain the G4ParticleGun object pointer and some other 
+    // primary particle realted values
+    G4ParticleGun*  GetParticleGun() { return fParticleGun; }
+
+    // Public method to get the primary particle name.
+    const G4String& GetParticleName() const;
+
+    // Public method to get the primary particle kinetic energy.
+    G4double        GetParticleEnergy() const;
+
+    // Public method to set the default primary particle kinematics
+    void            SetDefaultKinematic();
+
+    // Public method to set the position of the particle gun: will be taken for
+    // the actual detector construction
+    void            UpdatePosition();
+
+
+  // Data member declarations:
+  private:
+
+  	DetectorConstruction* fDetector;
+
+  	G4ParticleGun*            fParticleGun; 
+
 };
 
 #endif

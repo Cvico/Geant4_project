@@ -1,38 +1,56 @@
 #include "PrimaryGeneratorAction.hh"
+
 #include "DetectorConstruction.hh"
+
 #include "G4ParticleGun.hh"
-#include "G4Electron.hh"
+#include "G4Event.hh" 
+#include "G4ParticleTable.hh"
 
-PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det){
-    fDetector = det;
-    createParticleGun();
-    generateParticle();
+PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
+:   G4VUserPrimaryGeneratorAction(),
+    fDetector(det),
+    fParticleGun(nullptr) {
+    // create the particle-gun object
+    G4int nParticle = 1;
+    fParticleGun    = new G4ParticleGun(nParticle);
+    SetDefaultKinematic();
 }
 
-void PrimaryGeneratorAction::createParticleGun(){
-    // Default particleGun creation
-    fParticleGun = new G4ParticleGun(1);
-    return;
+
+PrimaryGeneratorAction::~PrimaryGeneratorAction() {
+    delete fParticleGun;
 }
 
-void PrimaryGeneratorAction::SetKinematics(){
-    fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.0, 0.0, 0.0));
-    return;
+
+void PrimaryGeneratorAction::GeneratePrimaries(G4Event* evt) {
+	fParticleGun->GeneratePrimaryVertex(evt);
 }
 
-void PrimaryGeneratorAction::UpdatePosition(){
-    // Default Particle Position
-    fParticleGun->SetParticlePosition(G4ThreeVector(fDetector->GetGunXPosition(), 0.0, 0.0));
-    return;
-}
-void PrimaryGeneratorAction::generateParticle(){
-    // Default particle generation
-    G4ParticleDefinition* part = G4Electron::Definition();
-    fParticleGun->SetParticleDefinition(part);
-    SetKinematics();
-    UpdatePosition();
-    fParticleGun->SetParticleEnergy(30.0*CLHEP::MeV);
-    return;
+
+void PrimaryGeneratorAction::SetDefaultKinematic() {
+    //
+    // default primary particle: 30 [MeV] e- perpendicular to the target
+   G4ParticleDefinition* part = G4ParticleTable::GetParticleTable()->FindParticle( "e-" );
+   fParticleGun->SetParticleDefinition( part );
+   fParticleGun->SetParticleMomentumDirection( G4ThreeVector(1., 0., 0.) );
+   fParticleGun->SetParticleEnergy( 30.*CLHEP::MeV );
+   UpdatePosition();
 }
 
-void PrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent){return;}
+
+// needs to be invoked for all workers at the begining of the run: user might 
+// have changed the target thickness
+void PrimaryGeneratorAction::UpdatePosition() {
+    fParticleGun->SetParticlePosition( 
+        G4ThreeVector( fDetector->GetGunXPosition(), 0.0, 0.0 ) );
+}
+
+
+const G4String& PrimaryGeneratorAction::GetParticleName() const {
+	return fParticleGun->GetParticleDefinition()->GetParticleName();
+}
+
+
+G4double PrimaryGeneratorAction::GetParticleEnergy() const {
+	return fParticleGun->GetParticleEnergy();
+}
