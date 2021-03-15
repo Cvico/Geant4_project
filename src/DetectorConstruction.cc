@@ -12,11 +12,10 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4PVPlacement.hh"
 
+
+
 DetectorConstruction::DetectorConstruction() 
-: G4VUserDetectorConstruction() { // Method inheritance 
-  // set default target material
-  // defaultMaterial = "G4_Si";
-  // defaultThickness = 1.0*CLHEP::cm
+: G4VUserDetectorConstruction() { 
   DetectorConstruction(G4NistManager::Instance()->FindOrBuildMaterial("G4_Si"),
                        1.0*CLHEP::cm);
 }

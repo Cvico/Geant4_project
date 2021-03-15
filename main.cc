@@ -1,9 +1,15 @@
+// ================================== //
+//    Author: Carlos Vico Villalba    //
+// ================================== //
+
+
 #include <iostream>
 #include "G4Types.hh"
 #include "globals.hh"
 #include "G4RunManager.hh"
 #include "G4PhysListFactory.hh"
 #include "DetectorConstruction.hh"
+#include "ActionInitialization.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
 #include "Materials.hh"
@@ -43,26 +49,36 @@ void importMaterials(Materials* obj){
 
 
 int main(){
-    /*
-    Materials * obj = new Materials();
-    importMaterials(obj);
+    
+    //Materials * obj = new Materials();
+    //importMaterials(obj);
     // Get a list of all the materials included
     // Call the destructor for freeing memory
-    obj->printListOfElements();
-    obj->~Materials();
-    */
+    //obj->printListOfElements();
+    //obj->~Materials();
 
     // initialize the runManager
     G4RunManager* runManager = new G4RunManager();
+
+    // Build your detector
     DetectorConstruction* detector = new DetectorConstruction();
     detector->Construct("MyWorld");
+
+    // Initialize the runManager 
     runManager->SetUserInitialization( detector );
+    
 
     // Create/obtain a Physics List and register it in the Run-Manager
     G4PhysListFactory physListFactory;
     const G4String plName = "FTFP_BERT";
     G4VModularPhysicsList* pl = physListFactory.GetReferencePhysList( plName );
     runManager->SetUserInitialization( pl ); 
+    
+    runManager->SetUserInitialization( new ActionInitialization(detector) );
+    runManager->Initialize();
 
+    G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(1);
+    runManager->BeamOn(10);
+    delete runManager;
     
 }

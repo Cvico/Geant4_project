@@ -1,2 +1,6 @@
 # Geant4 project
-In this repo I will keep track of the Geant4 exercises
+Welcome to the Geant4 simulation analysis performed during the **High Energy Physics at the Energy Frontier** lectures that were given at the Advanced Physics master (University of Oviedo, Spain).
+
+
+
+
