@@ -23,7 +23,7 @@ public:
     virtual void Build() const;
 
 private:
-    DetectorConstruction *fDetector = nullptr;
+    DetectorConstruction *fDetector;
 
 
 };

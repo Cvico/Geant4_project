@@ -30,7 +30,7 @@ class RunAction : public G4UserRunAction {
   // Data member declarations:
   private:
 
-  	PrimaryGeneratorAction*  fPrimary = nullptr;     
+  	PrimaryGeneratorAction*  fPrimary;     
 };
 
 #endif

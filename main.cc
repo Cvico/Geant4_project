@@ -71,7 +71,6 @@ int main(int argc, char** argv){
     
         // Build your detector
     DetectorConstruction* detector = new DetectorConstruction();
-    detector->Construct("MyWorld");
 
     // Initialize the runManager 
     runManager->SetUserInitialization( detector );

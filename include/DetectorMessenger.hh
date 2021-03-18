@@ -21,10 +21,10 @@ class DetectorMessenger : public G4UImessenger {
 
         virtual void SetNewValue(G4UIcommand* cmd, G4String value);
     private:
-        DetectorConstruction*      fDetector = nullptr;
-        G4UIdirectory*             fDirCMD = nullptr;
-        G4UIcmdWithADoubleAndUnit* fTargetThicknessCMD = nullptr;
-        G4UIcmdWithAString*        fTargetMaterialCMD = nullptr;
+        DetectorConstruction*      fDetector;
+        G4UIdirectory*             fDirCMD;
+        G4UIcmdWithADoubleAndUnit* fTargetThicknessCMD;
+        G4UIcmdWithAString*        fTargetMaterialCMD;
 };
 
 #endif

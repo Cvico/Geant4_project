@@ -18,49 +18,16 @@ class DetectorConstruction : public G4VUserDetectorConstruction
 {
 public:
 
-  /**
-  * @brief Default constructor
-  * @return DetectorConstruction object
-  */
   DetectorConstruction();
-  /**
-  * @brief Constructor for setting up the detector based on a certain material
-  * @param mat material to add to the detector construction
-  * @return DetectorConstruction object
-  */
-  DetectorConstruction(G4Material *mat);
-  /**
-  * @brief Constructor for setting up both the target material and the thickness of it.
-  * @param mat material which makes up the target 
-  * @param targetThickness thickness of the target
-  * @return DetectorConstruction object
-  */
-  DetectorConstruction(G4Material *mat, G4double targetThickness);
-  /**
-  * @brief Destructor
-  */
+
   ~DetectorConstruction();
 
   // Getters
-  /**
-  * @brief Returns the stored G4Box that builds up the solid world
-  * @return G4Box
-  */
-  G4Box *GetTargetBox() { return fBox; }
-  /**
-  * @brief Returns the stored G4LogicalVolume that builds up the logical world
-  * @return G4LogicalVolume
-  */
-  G4LogicalVolume *GetTargetLogicalVolume() { return fLogicalVolume; }
-  /**
-  * @brief Returns the stored G4PhysicalVolume that builds up the physical world
-  * @return G4PhysicalVolume
-  */
-  G4VPhysicalVolume *GetTargetPhysicalVolume() { return fPhysicalVolume; }
-  /**
-  * @brief Returns the target material object
-  * @return G4Material
-  */
+
+  G4Box *GetTargetBox() { return fTargetSolid; }
+  G4LogicalVolume *GetTargetLogicalVolume() { return fTargetLogical; }
+  G4VPhysicalVolume *GetTargetPhysicalVolume() { return fTargetPhysical; }
+
   G4Material *GetTargetMaterial() { return fTargetMaterial; };
   G4double GetTargetThickness() { return fTargetThickness; };
   G4double GetGunXPosition() { return fGunXPosition; };
@@ -68,71 +35,62 @@ public:
   G4double GetGunZPosition() { return fGunZPosition; };
 
   // Setters
-  /**
-  * @brief Sets the target material by performing fTargetMaterial = mat
-  * @param mat Material to build the target
-  * @return G4Material
-  */
-  void setTargetMaterial(G4Material* mat) { fTargetMaterial = mat; };
-  void setTargetMaterial(G4String matName);
-  void setTargetThickness(G4double targetThickness) { fTargetThickness = targetThickness; };
-  void SetGunXPosition(G4double GunXPosition) { fGunXPosition = GunXPosition; };
-  void SetGunYPosition(G4double GunYPosition) { fGunYPosition = GunYPosition; };
-  void SetGunZPosition(G4double GunZPosition) { fGunZPosition = GunZPosition; };
 
+  void setTargetMaterial(G4Material* mat);
+  void setTargetMaterial(const G4String matName);
+  void setTargetThickness(G4double targetThickness);
+  void setGunXPosition(G4double GunXPosition) { fGunXPosition = GunXPosition; };
+  void setGunYPosition(G4double GunYPosition) { fGunYPosition = GunYPosition; };
+  void setGunZPosition(G4double GunZPosition) { fGunZPosition = GunZPosition; };
+  void setWorldXsize(G4double worldXsize) { fWorldXsize = worldXsize; };
+  void setWorldYsize(G4double worldYsize) { fWorldYsize = worldYsize; };
+  void setWorldZsize(G4double worldZsize) { fWorldZsize = worldZsize; };
+  void setTargetXsize(G4double targetXsize) { fTargetXsize = targetXsize; };
+  void setTargetYsize(G4double targetYsize) { fTargetYsize = targetYsize; };
+  void setTargetZsize(G4double targetZsize) { fTargetZsize = targetZsize; };
   // methods to build solid world
   
   // Setters
-  /**
-  * @brief Builds the solid world for the detector. It has three overloaded methods:
-  * @brief * no parameters passed: it takes default attributes
-  * @brief * If a name is passed, then it takes default attributes and sets its name as the one passed
-  * @brief * If a name and three position coordinates are passed, then also the the position for the solid world is set
-  */
-  void buildSolidWorld();
-  void buildSolidWorld(G4String Name);
-  void buildSolidWorld(G4String Name, G4double worldXsize, G4double worldYsize, G4double worldZsize);
-  // methods to build logical world
-  
-  /**
-  * @brief Sets the logical world. There are two overloaded methods:
-  * @brief * If no parameter is passed, then the default attributes are used, see that documentation
-  * @brief * If a name is passed, then world's name is set
-  */
-  void buildLogicalWorld();
-  void buildLogicalWorld(G4String Name);
-  // methods to build physical world
-  /**
-  * @brief Sets the Physical world. There are two overloaded methods:
-  * @brief * If no parameter is passed, then the default attributes are used, see that documentation
-  * @brief * If a name is passed, then world's name is set
-  */
-  void buildPhysicalWorld();
-  void buildPhysicalWorld(G4String Name);
 
-  // Method to finally build the detector
+  void buildSolidWorld();
+  void buildLogicalWorld();
+  void buildPhysicalWorld();
+  void buildSolidTarget();
+  void buildLogicalTarget();
+  void buildPhysicalTarget();
+
   virtual G4VPhysicalVolume *Construct();
-  virtual G4VPhysicalVolume *Construct(G4String Name);
-  virtual G4VPhysicalVolume *Construct(G4String Name, G4double worldXsize, G4double worldYsize, G4double worldZsize);
 
   void checkValidity(G4Material *mat);
 
 private:
-  G4Material *fTargetMaterial = nullptr;
-  G4Box *fBox= nullptr;
-  G4LogicalVolume *fLogicalVolume= nullptr;
-  G4VPhysicalVolume *fPhysicalVolume= nullptr;
-  G4double fTargetThickness= 1*CLHEP::m;
+  G4Material *fTargetMaterial;
 
-  G4double fWorldXsize = 1 * CLHEP::m;
-  G4double fWorldYsize = 1 * CLHEP::m;
-  G4double fWorldZsize = 1 * CLHEP::m;
+  // For worlds
+  G4Box *fSolidWorld = nullptr;
+  G4LogicalVolume *fLogicalWorld = nullptr;
+  G4VPhysicalVolume *fWorldPhysical;
 
-  G4double fGunXPosition = 1 * CLHEP::m;
-  G4double fGunYPosition = 1 * CLHEP::m;
-  G4double fGunZPosition = 1 * CLHEP::m;
+  // For targets
+  G4Box *fTargetSolid = nullptr;
+  G4LogicalVolume *fTargetLogical = nullptr;
+  G4VPhysicalVolume *fTargetPhysical;
 
-  DetectorMessenger* fDetMessenger= nullptr; 
+  G4double fTargetThickness;
+
+  G4double fWorldXsize;
+  G4double fWorldYsize;
+  G4double fWorldZsize;
+
+  G4double fTargetXsize;
+  G4double fTargetYsize;
+  G4double fTargetZsize;
+
+  G4double fGunXPosition;
+  G4double fGunYPosition;
+  G4double fGunZPosition;
+
+  DetectorMessenger* fDetMessenger; 
 };
 
 #endif
