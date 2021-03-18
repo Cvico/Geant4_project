@@ -4,9 +4,10 @@
 
 #include "G4VUserDetectorConstruction.hh"
 #include "Materials.hh"
+#include "DetectorMessenger.hh"
 #include "G4Box.hh"
 class G4Material;
-
+class DetectorMessenger;
 
 /**
  A User-defined class used for setting up the required attributes that define a detector. 
@@ -60,7 +61,7 @@ public:
   * @brief Returns the target material object
   * @return G4Material
   */
-  G4Material *GetMaterial() { return fTargetMaterial; };
+  G4Material *GetTargetMaterial() { return fTargetMaterial; };
   G4double GetTargetThickness() { return fTargetThickness; };
   G4double GetGunXPosition() { return fGunXPosition; };
   G4double GetGunYPosition() { return fGunYPosition; };
@@ -72,7 +73,8 @@ public:
   * @param mat Material to build the target
   * @return G4Material
   */
-  void setMaterial(G4Material *mat) { fTargetMaterial = mat; };
+  void setTargetMaterial(G4Material* mat) { fTargetMaterial = mat; };
+  void setTargetMaterial(G4String matName);
   void setTargetThickness(G4double targetThickness) { fTargetThickness = targetThickness; };
   void SetGunXPosition(G4double GunXPosition) { fGunXPosition = GunXPosition; };
   void SetGunYPosition(G4double GunYPosition) { fGunYPosition = GunYPosition; };
@@ -116,11 +118,11 @@ public:
   void checkValidity(G4Material *mat);
 
 private:
-  G4Material *fTargetMaterial;
-  G4Box *fBox;
-  G4LogicalVolume *fLogicalVolume;
-  G4VPhysicalVolume *fPhysicalVolume;
-  G4double fTargetThickness;
+  G4Material *fTargetMaterial = nullptr;
+  G4Box *fBox= nullptr;
+  G4LogicalVolume *fLogicalVolume= nullptr;
+  G4VPhysicalVolume *fPhysicalVolume= nullptr;
+  G4double fTargetThickness= 1*CLHEP::m;
 
   G4double fWorldXsize = 1 * CLHEP::m;
   G4double fWorldYsize = 1 * CLHEP::m;
@@ -129,6 +131,8 @@ private:
   G4double fGunXPosition = 1 * CLHEP::m;
   G4double fGunYPosition = 1 * CLHEP::m;
   G4double fGunZPosition = 1 * CLHEP::m;
+
+  DetectorMessenger* fDetMessenger= nullptr; 
 };
 
 #endif

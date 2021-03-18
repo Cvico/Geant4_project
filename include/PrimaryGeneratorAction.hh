@@ -45,13 +45,13 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
 
   // Data member declarations:
   private:
-  	DetectorConstruction* fDetector;
-    G4ParticleGun*        fParticleGun; 
+  	DetectorConstruction* fDetector = nullptr;
+    G4ParticleGun*        fParticleGun = nullptr; 
     G4ParticleMomentum fMomentum;
     G4ThreeVector fMomentumDir;
-    G4double fPartEnergy;
+    G4double fPartEnergy = 0;
     G4ThreeVector fPartPosition;
-    G4int fNparticles;
+    G4int fNparticles = 1;
 };
 
 #endif

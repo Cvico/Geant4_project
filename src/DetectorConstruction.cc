@@ -31,6 +31,7 @@ DetectorConstruction::DetectorConstruction(G4Material* mat, G4double targetThick
   checkValidity(mat);
   fTargetMaterial  = mat;
   fTargetThickness = targetThickness;  
+  fDetMessenger = new DetectorMessenger(this);
 }
 
 DetectorConstruction::~DetectorConstruction(){}
@@ -113,6 +114,11 @@ G4VPhysicalVolume* DetectorConstruction::Construct(G4String Name, G4double World
 }
 
 
+void DetectorConstruction::setTargetMaterial(G4String matName){
+    G4Material* mat = G4NistManager::Instance()->FindOrBuildMaterial(matName);
+    checkValidity(mat);
+    fTargetMaterial = mat;
+}
 
 void DetectorConstruction::checkValidity(G4Material* mat){
   if (mat == nullptr) {

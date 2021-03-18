@@ -10,8 +10,12 @@
 #include "G4PhysListFactory.hh"
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
+#include "G4UImanager.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
+#include "G4UIExecutive.hh"
+#include "G4VisExecutive.hh"
+#include "G4VisManager.hh"
 #include "Materials.hh"
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
@@ -48,7 +52,7 @@ void importMaterials(Materials* obj){
 }
 
 
-int main(){
+int main(int argc, char** argv){
     
     //Materials * obj = new Materials();
     //importMaterials(obj);
@@ -56,29 +60,53 @@ int main(){
     // Call the destructor for freeing memory
     //obj->printListOfElements();
     //obj->~Materials();
-
+    
+    // Detect interactive mode (if no arguments) and define UI: 
+    G4UIExecutive* ui=0;
+    if (argc ==1 ){
+        ui = new G4UIExecutive(argc, argv, "tcsh");
+    }
     // initialize the runManager
     G4RunManager* runManager = new G4RunManager();
-
-    // Build your detector
+    
+        // Build your detector
     DetectorConstruction* detector = new DetectorConstruction();
     detector->Construct("MyWorld");
 
     // Initialize the runManager 
     runManager->SetUserInitialization( detector );
-    
 
     // Create/obtain a Physics List and register it in the Run-Manager
     G4PhysListFactory physListFactory;
     const G4String plName = "FTFP_BERT";
     G4VModularPhysicsList* pl = physListFactory.GetReferencePhysList( plName );
     runManager->SetUserInitialization( pl ); 
-    
-    runManager->SetUserInitialization( new ActionInitialization(detector) );
-    runManager->Initialize();
 
-    G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(1);
-    runManager->BeamOn(10);
+    runManager->SetUserInitialization( new ActionInitialization(detector) );
+    // Initialize the visualisation manager:
+    G4VisManager* visManager = new G4VisExecutive;
+    visManager->Initialize();
+    
+      // Detect batch-mode: 
+    G4UImanager* UImanager = G4UImanager::GetUIpointer();
+    if ( !ui ) {
+    G4String cmd = "/control/execute ";
+    G4String scmd = argv[1];
+    UImanager->ApplyCommand(cmd + scmd);
+    } else {
+    UImanager->ApplyCommand("/control/execute vis.mac");
+    ui->SessionStart();
+    delete ui;
+    }
+    
+    
+ //   runManager->Initialize();
+
+    //G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(1);
+    //runManager->BeamOn(10);
+
+    
     delete runManager;
+    delete visManager;
     
 }
