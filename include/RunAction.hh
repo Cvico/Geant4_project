@@ -9,6 +9,20 @@
 class PrimaryGeneratorAction;
 class G4Run;
 
+/**
+* @brief It accumulates statistics and computes dispersion 
+* @brief of the energy deposit and track lengths of charged 
+* @brief particles with the aid of analysis tools. H1D 
+* @brief histograms are created in BeginOfRunAction() 
+* @brief for the energy deposit and track length in both Absorber 
+* @brief and Gap volumes. The same values are also saved in an ntuple.
+* @brief The histograms and ntuple are saved in the output file in a 
+* @brief format according to a selected technology in B4Analysis.hh.
+* @brief In EndOfRunAction(), the accumulated statistics and computed
+* @brief dispersion are printed. When running in multi-threading mode, 
+* @brief the histograms accumulated on threads are automatically merged
+* @brief in a single output file, while the ntuple is written in files per thread.
+*/
 
 class RunAction : public G4UserRunAction {
 

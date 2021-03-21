@@ -3,7 +3,13 @@
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
-
+/**
+ * @brief It defines data members to hold the energy deposit and 
+ * @brief track lengths of charged particles in the Absorber and Gap layers. 
+ * @brief In EndOfEventAction(), these quantities are printed and filled in 
+ * @brief H1D histograms and ntuple to accumulate statistic and compute 
+ * @brief dispersion.
+ */
 class EventAction : public G4UserEventAction {
 
   // Method declaration:
@@ -26,7 +32,6 @@ class EventAction : public G4UserEventAction {
 
   // Data member declarations:
   private:
-    
     G4double   fEdepPerEvt;
     G4double   fChTrackLengthPerEvt;
 
