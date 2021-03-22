@@ -37,7 +37,9 @@ def get_histograms(rfile):
 
 def get_histograms_dict(rfiles):
     if isinstance(rfiles, str):
+        env_variables["doFor"] = False
         return get_histograms( rfiles )
+    env_variables["doFor"] = True
     h_dict = { re.match("^(.*)/(.*).root$", rfile)[2] : get_histograms(rfile) for rfile in rfiles }
         
     return h_dict
@@ -54,16 +56,17 @@ def get_dims(opt):
 def create_canvas(name):
     # Size of the Canvas
     # ------------------------    
+    
     topx, topy, ww, wh = get_dims("canvas")
     c = r.TCanvas( 'c_' + name, '', topx, topy, ww, wh )
     return c
 
 
-def print_template_histograms(histograms, doFor, key = ""):
-    if (doFor):
+def print_template_histograms(histograms, key = ""):
+    if (env_variables["doFor"]):
         for key in histograms:
             # prepare the results folder to store the plots
-            print_template_histograms( histograms = histograms[key], doFor = False, key = key )
+            print_template_histograms( histograms = histograms[key], key = key )
         return
     
     outpath = "/".join([env_variables["outpath"], key, "templates"]) 
@@ -71,6 +74,7 @@ def print_template_histograms(histograms, doFor, key = ""):
     for hist in histograms:
         c = create_canvas(hist)    
         histograms[hist].Draw("hist")
+        print(outpath)
         c.Print(outpath + "/%s.png"%hist, 'png')
         c.Print(outpath + "/%s.pdf"%hist, 'pdf')
     return
@@ -86,5 +90,5 @@ if __name__ == "__main__":
     # Get a dictionary with the histograms contained in the rootfiles
     histograms = get_histograms_dict( list_rfiles if len(list_rfiles) != 1 else list_rfiles[0] )
     
-    print_template_histograms( histograms, len(histograms.keys()) != 1 )
+    print_template_histograms( histograms )
     
