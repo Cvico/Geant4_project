@@ -3,16 +3,20 @@
 # ================== #
 
 
-
 import ROOT as r 
 import numpy as np
 import argparse
 import os, sys, re
 from copy import deepcopy
+import canvases as cv
+
+
 
 r.gROOT.SetBatch(1)
 r.gStyle.SetOptStat(0)
 env_variables = {}
+
+
 
 
 def add_options():
@@ -45,31 +49,6 @@ def get_histograms_dict(rfiles):
         
     return h_dict
 
-def get_dims(opt):
-    if opt == "canvas":
-        topx, topy, ww, wh = 10, 10, 1000, 800
-        return ( topx, topy, ww, wh ) # last 2 for printing with 2 pads
-    if opt == "legend":
-        fLegX1, fLegY1, fLegX2, fLegY2 = 0.75, 0.55, 0.89, 0.89
-        legendTextSize = 0.035
-        return( fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize )
-
-
-def create_canvas(name):
-    # Size of the Canvas
-    # ------------------------    
-    topx, topy, ww, wh = get_dims("canvas")
-    c = r.TCanvas( 'c_' + name, '', topx, topy, ww, wh )
-    return c
-
-def create_legend():
-    fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize = get_dims("legend")
-    l = r.TLegend(fLegX1, fLegY1, fLegX2, fLegY2)
-    l.SetBorderSize(0)
-    l.SetFillColor(10)
-    l.SetTextSize(legendTextSize)
-    return l
-
 def print_template_histograms(histograms, key = ""):
     if (env_variables["doFor"]):
         for key in histograms:
@@ -80,9 +59,9 @@ def print_template_histograms(histograms, key = ""):
     outpath = "/".join([env_variables["outpath"], key, "templates"]) 
     os.system("mkdir -p %s"%outpath) if not os.path.exists(outpath) else 1
     for hist in histograms:
-        c = create_canvas(hist) 
+        c = cv.create_canvas(hist) 
         
-        l = create_legend()
+        l = cv.create_legend()
         h = histograms[hist]
         h.SetMaximum(h.GetMaximum()*1.1)
         h.SetMinimum(0)
@@ -98,7 +77,6 @@ def print_template_histograms(histograms, key = ""):
         c.Print(outpath + "/%s.png"%hist, 'png')
         c.Print(outpath + "/%s.pdf"%hist, 'pdf')
     return
-
 # === Main script
 if __name__ == "__main__": 
     add_options()
