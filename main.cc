@@ -59,7 +59,7 @@ int main(int argc, char** argv){
     
     // Detect interactive mode (if no arguments) and define UI: 
     G4UIExecutive* ui=0;
-    if (argc ==1 ){
+    if (argc == 1 ){
         ui = new G4UIExecutive(argc, argv, "tcsh");
     }
     
@@ -86,12 +86,13 @@ int main(int argc, char** argv){
     
       // Detect batch-mode: 
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
-    if ( argc != 1 ) {
+    UImanager->ApplyCommand("/control/macroPath ../macros/");
+    if ( !ui ) {
         G4String cmd = "/control/execute ";
         G4String scmd = argv[1];
         UImanager->ApplyCommand(cmd + scmd);
     } else {
-    UImanager->ApplyCommand("/control/execute vis.mac");
+    UImanager->ApplyCommand("/control/execute init_vis.mac");
     ui->SessionStart();
     delete ui;
     }
