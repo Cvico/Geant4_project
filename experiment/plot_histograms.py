@@ -11,6 +11,7 @@ import os, sys, re
 from copy import deepcopy
 
 r.gROOT.SetBatch(1)
+r.gStyle.SetOptStat(0)
 env_variables = {}
 
 
@@ -53,14 +54,21 @@ def get_dims(opt):
         legendTextSize = 0.035
         return( fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize )
 
+
 def create_canvas(name):
     # Size of the Canvas
     # ------------------------    
-    
     topx, topy, ww, wh = get_dims("canvas")
     c = r.TCanvas( 'c_' + name, '', topx, topy, ww, wh )
     return c
 
+def create_legend():
+    fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize = get_dims("legend")
+    l = r.TLegend(fLegX1, fLegY1, fLegX2, fLegY2)
+    l.SetBorderSize(0)
+    l.SetFillColor(10)
+    l.SetTextSize(legendTextSize)
+    return l
 
 def print_template_histograms(histograms, key = ""):
     if (env_variables["doFor"]):
@@ -72,9 +80,21 @@ def print_template_histograms(histograms, key = ""):
     outpath = "/".join([env_variables["outpath"], key, "templates"]) 
     os.system("mkdir -p %s"%outpath) if not os.path.exists(outpath) else 1
     for hist in histograms:
-        c = create_canvas(hist)    
-        histograms[hist].Draw("hist")
-        print(outpath)
+        c = create_canvas(hist) 
+        
+        l = create_legend()
+        h = histograms[hist]
+        h.SetMaximum(h.GetMaximum()*1.1)
+        h.SetMinimum(0)
+        h.Draw("hist")
+        h.SetTitle("")
+        l.AddEntry(h, h.GetName(), "l")
+        l.Draw("same")
+        
+        H = r.TLatex()
+        H.SetTextSize(0.07)
+        H.DrawLatexNDC(0.1, 0.92,"#font[22]{FPFE} | #font[12]{Academic}")
+
         c.Print(outpath + "/%s.png"%hist, 'png')
         c.Print(outpath + "/%s.pdf"%hist, 'pdf')
     return
@@ -84,7 +104,6 @@ if __name__ == "__main__":
     add_options()
     
     # Get a list of all the rootfiles in the given path
-    print(env_variables)
     list_rfiles = [ "/".join([env_variables["path"], rfile]) for rfile in os.listdir(env_variables["path"]) if (".root" in rfile) == True ]
     
     # Get a dictionary with the histograms contained in the rootfiles
