@@ -9,60 +9,53 @@
 
 
 MODE="$1"
-OUTPUTFOLDER="$2"
+
+# Some formatting colors for output
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
 plot() {
     cd "./experiment"
     
-    
-    if [[ $OUTPUTFOLDER == "" ]]
-    then
-        OUTPUTRESULTPATH="./results"
-    else 
-        OUTPUTRESULTPATH=$OUTPUTFOLDER
-    fi
-    COMMAND="plot_histograms.py --path ../build --outpath $OUTPUTRESULTPATH"
-    echo "Running plotting script:"
+    INPATH="../build"
+    OUTPUTRESULTPATH="./results"
+    COMMAND="plot_histograms.py --path $INPATH --outpath $OUTPUTRESULTPATH"
 
+    echo -e "${GREEN}[INFO]${NC}: Running plotting script:"
     python $COMMAND
     cd ..
 }
 
 compile () {
-
-    # Make sure you run the macro in the 
-    # Check if the build folder has already been created
     buildFolder="./build"
+
     if [[ ! -d $buildFolder ]]
     then
-        echo "The folder ${buildFolder} does not exist"
-        echo "... Creating folder to build code"
+        echo -e "${GREEN}[INFO]${NC}: The folder ${buildFolder} does not exist"
+        echo "                     ... Creating folder to build code"
         mkdir $buildFolder
     fi
 
-    # Then cd to that folder and compile with Cmake
     cd $buildFolder
 
-
-
     # Compile libraries
-    cmake -DGeant4_DIR=$G4LIB ../
+    cmake -DGeant4_DIR=$G4LIB -DGEANT4_USE_OPENGL_X11=ON ../
     make
 
 
     # Compile the macro to check if everything works fine+
 
-
-    echo "========= COMPILING MACRO ==========="
-    ./main run.mac
-    echo "========= END OF COMPILATION ========"
+    echo -e "${GREEN}[COMPILING MSG]${NC} ========= COMPILING MACRO ==========="
+    ./main 
+    echo -e "${GREEN}[COMPILING MSG]${NC} ========= END OF COMPILATION ========"
     # Return to the previous folder
     cd ..   
 }
 # Default MODE=1
 if [[ $MODE == "" ]]
 then
-    echo "No mode has been specified... Running MODE=1 as default. See README for more information about compiling modes"
+    echo -e "${BLUE}[WARNING]${NC}: No mode has been specified... Running MODE=1 as default. See README for more information about compiling modes"
     compile
 fi
 
@@ -76,8 +69,9 @@ then
     plot  
 fi
 
-if [[ $MODE == 3 ]] # Compile Plot results
+if [[ $MODE == 3 ]] # Compile and plot results
 then 
     compile
     plot  
 fi
+
