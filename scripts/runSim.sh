@@ -20,7 +20,7 @@ plot() {
     
     INPATH="../build"
     OUTPUTRESULTPATH="./results"
-    COMMAND="plot_histograms.py --path $INPATH --outpath $OUTPUTRESULTPATH"
+    COMMAND="g4Plots.py --path $INPATH --outpath $OUTPUTRESULTPATH"
 
     echo -e "${GREEN}[INFO]${NC}: Running plotting script:"
     python $COMMAND
@@ -47,7 +47,7 @@ compile () {
     # Compile the macro to check if everything works fine+
 
     echo -e "${GREEN}[COMPILING MSG]${NC} ========= COMPILING MACRO ==========="
-    ./main 
+    ./main run1.mac
     echo -e "${GREEN}[COMPILING MSG]${NC} ========= END OF COMPILATION ========"
     # Return to the previous folder
     cd ..   
