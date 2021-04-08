@@ -40,7 +40,7 @@ compile () {
     cd $buildFolder
 
     # Compile libraries
-    cmake -DGeant4_DIR=$G4LIB -DGEANT4_USE_OPENGL_X11=ON ../
+    cmake3 -DGeant4_DIR=$G4COMP ../
     make
 
 
