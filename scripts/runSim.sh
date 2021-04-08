@@ -9,6 +9,7 @@
 
 
 MODE="$1"
+MACRO="$2"
 
 # Some formatting colors for output
 RED='\033[0;31m'
@@ -47,20 +48,31 @@ compile () {
     # Compile the macro to check if everything works fine+
 
     echo -e "${GREEN}[COMPILING MSG]${NC} ========= COMPILING MACRO ==========="
-    ./main run1.mac
+    ./main $MACRO
     echo -e "${GREEN}[COMPILING MSG]${NC} ========= END OF COMPILATION ========"
     # Return to the previous folder
-    cd ..   
+    cd ..  
+
+    # Now copy the output rootfile to the ./experiment/inputs path so we can store 
+    # these rootfiles for later use without having to compile again
+    cp "./build *.root ./experiment/inputs"
+	 
 }
+
 # Default MODE=1
 if [[ $MODE == "" ]]
 then
-    echo -e "${BLUE}[WARNING]${NC}: No mode has been specified... Running MODE=1 as default. See README for more information about compiling modes"
-    compile
+    echo -e "${BLUE}[WARNING]${NC}: No mode has been specified... See README for more information about compiling modes"
 fi
+
 
 if [[ $MODE == 1 ]] # COMPILE AND RUN THE .MAC FILE
 then
+   if [[ $MACRO == ""]] 
+   then
+      echo -e "${RED}[ERROR]${NC}: Please, select a run macro to run from the ./macros folder"
+   fi
+
     compile
 fi
 
