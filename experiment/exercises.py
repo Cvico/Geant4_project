@@ -1,16 +1,22 @@
+import os, re, sys
+import ROOT as r
+from copy import deepcopy
+import argparse
 import plotter as g4plt
+env_variables = { "matching" : "(.*):(.*);(.*),(.*)" }
 
 def add_options():
     parser = argparse.ArgumentParser(description='Geant4 simulation plotter')
-    parser.add_argument('--path', '-p', metavar = 'path', help = 'path where the rootfile(s) is(are) stored')
-    parser.add_argument('--outpath', '-o', metavar = 'outpath', help = 'path where the results are stored', default = "./results")
-    parser.add_argument('--json', '-j', metavar = 'json', help = "Json name for storing experiments", default = 'run')
-    options = vars(parser.parse_args())
-    for opt in options :
-        env_variables[opt] = options[opt]
-
+    parser.add_argument('--exercise', '-e', metavar = 'exercise', help = 'Exercise from the report that we want to reproduce')
+  
+    env_variables["exercise"] = parser.parse_args().exercise
     return 
 
+def set_exercise_config(exercise):
+    if exercise == "1":
+	env_variables["path"] = "./experiment/inputs/ex1/"
+	env_variables["outpath"] = "./experiment/results/ex1/"
+    return 
 
 def get_histograms(rfile):
     f = r.TFile.Open(rfile)
@@ -45,7 +51,7 @@ def set_hists_to_plot():
     env_variables["to_plot"] = read_txt()
 
 def read_txt():
-    txt_name = "g4plots.txt"
+    txt_name = "./experiment/g4plots.txt"
     f = open(txt_name)
     lines = [ re.match(env_variables["matching"], line.replace(" ", "")).groups() for line in f.readlines() if ("#" not in line[0] and line!="" and line!="\n") ]
     hists_to_plot = { line[0] : line[1:] for line in lines}
@@ -54,7 +60,7 @@ def read_txt():
 # === Main script
 if __name__ == "__main__": 
     add_options()
-    
+    set_exercise_config(env_variables["exercise"])    
     # Get a list of all the rootfiles in the given path
     list_rfiles = [ "/".join([env_variables["path"], rfile]) for rfile in os.listdir(env_variables["path"]) if (".root" in rfile) == True ]
     
@@ -65,8 +71,6 @@ if __name__ == "__main__":
     set_hists_to_plot()
     
     # Print the histograms following the txt directives.
-    print_histograms(env_variables)
+    g4plt.print_histograms(env_variables)
 
-    # Save information about this run in a json file
-    save_json()
  

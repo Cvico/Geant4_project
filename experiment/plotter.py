@@ -3,17 +3,13 @@
 # ================== #
 
 
-import ROOT as r 
-import numpy as np
-import argparse
-import os, sys, re
-from copy import deepcopy
-import json
-
+import ROOT as  r
+import os, re, sys
 r.gROOT.SetBatch(1)
 r.gStyle.SetOptStat(0)
-env_variables = { "matching" : "(.*):(.*);(.*),(.*)" }
 
+def make_path(path):
+    os.system("mkdir -p %s"%path) if not os.path.exists(path) else 1
 
 def get_dims(opt):
     if opt == "canvas":
