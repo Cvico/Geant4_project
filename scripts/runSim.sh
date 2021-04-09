@@ -20,8 +20,9 @@ runExercise() {
         mkdir -p $OUTPUTFOLDER    
     for f in ${MACROSTORUN[@]}
     do
+	OUTPUTNAME=$(echo $f | awk -F'.mac' '{print $1}')
         ./main $MACROSPATH/$f
-	cp ./main.root $OUTPUTFOLDER/$f.root
+	cp ./main.root $OUTPUTFOLDER/$OUTPUTNAME.root
     done
     echo -e "[COMPILING MSG] ========= FINISHING SIMULATION ========"
     # Return to the previous folder
