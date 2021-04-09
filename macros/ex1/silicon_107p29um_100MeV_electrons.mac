@@ -1,0 +1,48 @@
+# ******************************************************************************
+# This is the Geant4 macro file to simulate the energy loss/deposit distribution
+# in a 107.29 [um] thin silicon when hit (perpendicularly) by 100 [MeV] electrons.
+# ******************************************************************************
+
+
+# ------------------------------------------------------------------------------  
+# to print information regarding the Run e.g. timing
+/run/verbose 1
+
+# ------------------------------------------------------------------------------  
+# to print out step information after each step 
+## /tracking/verbose 1
+
+# ------------------------------------------------------------------------------  
+# Your own UI commands defined by "YourDetectorMessenger" to set some of the   
+# properties (thickness, material) of the target:                           
+# ==============================================================================
+# set the target thickness to match the experimental one: 107.29 um
+/App/det/setTargetThickness 107.29 um
+# set the target material to match the experimental one: Silicon
+/App/det/setTargetMaterial G4_Si
+
+
+# ------------------------------------------------------------------------------
+# initialization of the Run 
+/run/initialize
+
+# ------------------------------------------------------------------------------
+# set the secondary production threshold smaller than the target thickness
+# (Note, this will be discussed during the advanced Geant4 course)
+/run/setCut 1.0 um
+
+# ------------------------------------------------------------------------------
+# Set the primary generator (i.e. the Particle Gun) properties:
+# ==============================================================================  
+# set the particle energy to match the experimental one: 100 MeV
+/gun/energy 100 MeV
+# set the particle type to match the experimental one: electron
+/gun/particle e-
+
+# ------------------------------------------------------------------------------
+# report progress of the simulation at each 100 000 -th event
+/run/printProgress 100000
+
+# ------------------------------------------------------------------------------
+# execute the simulation with 1 000 000 events
+/run/beamOn 1000000
