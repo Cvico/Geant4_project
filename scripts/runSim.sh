@@ -9,34 +9,23 @@
 MODE=$1
 EXERCISE=$2
 
-# Some formatting colors for output
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
 runExercise() {
     cd "./build"
 
-    MACROSTORUN=("run1.mac")
+    MACROSPATH="../macros/ex$EXERCISE"
+    MACROSTORUN=$(ls ../macros/ex$EXERCISE )
+    OUTPUTFOLDER="../experiment/inputs/ex"$EXERCISE
 
-
-    echo -e "${GREEN}[COMPILING MSG]${NC} ========= BEGINING SIMULATION ==========="
-     
+    echo -e "[COMPILING MSG] ========= BEGINING SIMULATION ==========="
+        mkdir -p $OUTPUTFOLDER    
     for f in ${MACROSTORUN[@]}
     do
-        ./main $f
+        ./main $MACROSPATH/$f
+	cp ./main.root $OUTPUTFOLDER/$f.root
     done
-
-    echo -e "${GREEN}[COMPILING MSG]${NC} ========= FINISHING SIMULATION ========"
+    echo -e "[COMPILING MSG] ========= FINISHING SIMULATION ========"
     # Return to the previous folder
     cd ..  
-
-    # Now copy the output rootfile to the ./experiment/inputs path so we can store 
-    # these rootfiles for later use without having to compile again
-    OUTPUTFOLDER="./experiment/inputs/ex"$EXERCISE
-    mkdir $OUTPUTFOLDER
-    cp ./build/*.root $OUTPUTFOLDER
-	
 }
 
 compile () {
@@ -44,7 +33,7 @@ compile () {
 
     if [[ ! -d $buildFolder ]]
     then
-        echo -e "${GREEN}[INFO]${NC}: The folder ${buildFolder} does not exist"
+        echo -e "[INFO]: The folder ${buildFolder} does not exist"
         echo "                     ... Creating folder to build code"
         mkdir $buildFolder
     fi
