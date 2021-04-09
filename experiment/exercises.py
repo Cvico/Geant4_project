@@ -38,7 +38,7 @@ def set_histograms_dict(rfiles):
     doFor = env_variables["doFor"]
     
     if doFor: 
-        h_dict = { re.match("^(.*)/(.*).root$", rfile)[2] : get_histograms(rfile) for rfile in rfiles }
+	h_dict = { re.match("^(.*)/(.*).root$", rfile).groups()[1] : get_histograms(rfile) for rfile in rfiles }
         files = list(h_dict.keys())
     else: 
         h_dict = get_histograms(rfiles)  
