@@ -1,6 +1,6 @@
 # ******************************************************************************
 # This is the Geant4 macro file to simulate the energy loss/deposit distribution
-# in a 81.87 [um] thin silicon when hit (perpendicularly) by 100 [MeV] electrons.
+# in a 112.00 [um] thin silicon when hit (perpendicularly) by 100 [MeV] electrons.
 # ******************************************************************************
 
 
@@ -16,8 +16,8 @@
 # Your own UI commands defined by "YourDetectorMessenger" to set some of the   
 # properties (thickness, material) of the target:                           
 # ==============================================================================
-# set the target thickness to match the experimental one: 81.87 um
-/App/det/setTargetThickness 81.87 um
+# set the target thickness to match the experimental one: 112.00 um
+/App/det/setTargetThickness 112.00 um
 # set the target material to match the experimental one: Silicon
 /App/det/setTargetMaterial G4_Si
 
