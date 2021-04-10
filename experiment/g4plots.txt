@@ -1,9 +1,0 @@
-# ======================================================= #  
-# A txt file to select the histograms one wants to plot   #
-# ======================================================= #
-
-# The structure is:
-
-# name : [nbins, xmin, xmax] : X_axis_Title, Y_axis_Title
-Edep   : [50, 0, 0.09] ; x(#mum) , Events
-trackL : [50, 0, 19]   ; x(#mum) , Events

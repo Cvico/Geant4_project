@@ -30,32 +30,16 @@ def get_histograms(rfile):
 
 def set_histograms_dict(rfiles):
     ''' 
-        Function to store histograms from rootfiles in a 
-        custom environmental variable
+    Function to store histograms from rootfiles in a 
+    custom environmental variable
     '''
-    env_variables["doFor"] = False if isinstance(rfiles, str) else True
+    h_dict = { re.match("^(.*)/(.*).root$", rfile).groups()[1] : get_histograms(rfile) for rfile in rfiles }
+    files = list(h_dict.keys())
     
-    doFor = env_variables["doFor"]
-    
-    if doFor: 
-	h_dict = { re.match("^(.*)/(.*).root$", rfile).groups()[1] : get_histograms(rfile) for rfile in rfiles }
-        files = list(h_dict.keys())
-    else: 
-        h_dict = get_histograms(rfiles)  
-        files = re.match("^(.*)/(.*).root$", rfiles).groups()[1]
     env_variables["AnalysedFiles"] = files
     env_variables["histograms"] = h_dict
     return 
 
-def set_hists_to_plot():
-    env_variables["to_plot"] = read_txt()
-
-def read_txt():
-    txt_name = "./experiment/g4plots.txt"
-    f = open(txt_name)
-    lines = [ re.match(env_variables["matching"], line.replace(" ", "")).groups() for line in f.readlines() if ("#" not in line[0] and line!="" and line!="\n") ]
-    hists_to_plot = { line[0] : line[1:] for line in lines}
-    return hists_to_plot
 
 # === Main script
 if __name__ == "__main__": 
@@ -67,10 +51,7 @@ if __name__ == "__main__":
     # Get a dictionary with the histograms contained in the rootfiles
     set_histograms_dict( list_rfiles if len(list_rfiles) != 1 else list_rfiles[0] )
     
-    # Set the histograms we want to plot
-    set_hists_to_plot()
-    
     # Print the histograms following the txt directives.
-    g4plt.print_histograms(env_variables)
+    g4plt.draw_histos(env_variables)
 
- 
+    os.system("cp -r ./experiment/results/ex1 ~/www/private/FPFE/")
