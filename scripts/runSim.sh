@@ -13,9 +13,12 @@ runExercise() {
     cd "./build"
 
     MACROSPATH="../macros/ex$EXERCISE"
-    MACROSTORUN=$(ls ../macros/ex$EXERCISE/*.mac )
-    OUTPUTFOLDER="../experiment/inputs/ex"$EXERCISE
+    cd $MACROSPATH
+    MACROSTORUN=$(ls *.mac)
+    cd -
+
     echo $MACROSTORUN
+    OUTPUTFOLDER="../experiment/inputs/ex"$EXERCISE
     echo -e "[COMPILING MSG] ========= BEGINING SIMULATION ==========="
         mkdir -p $OUTPUTFOLDER    
     for f in ${MACROSTORUN[@]}
