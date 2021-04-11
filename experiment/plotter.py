@@ -43,8 +43,6 @@ def draw_histos(args):
     if env_variables["exercise"] == 1: draw_histos_ex1(args)
     return
 
-
-
 def draw_histos(env_variables):
    if env_variables["exercise"] == "1": draw_histos_ex1(env_variables)
    return
@@ -59,8 +57,8 @@ def draw_histos_ex1(env_variables):
    outpath = env_variables["outpath"]	 
    make_path(outpath)
  
-   xtitles = {"proton"  : "E(GeV)/#mum",
-	      "electron": "E(MeV)/#mum" }
+   xtitles = {"proton"  : "E(GeV)",
+	      "electron": "E(MeV)" }
    
    for part in ["proton", "electron"]:	
         c = create_canvas("edep_" + part)
@@ -70,18 +68,14 @@ def draw_histos_ex1(env_variables):
 	     if part not in rfile: continue
              edep   = histos[rfile]["Edep"]
 
-	     #edep.Divide(trackl)
 	     if (edep.GetMaximum() == 0.0): continue
  	     thickness = float(re.match("(.*)_(.*)(um)_(.*)_(.*)", rfile).groups()[1].replace("p", "."))
-	     norm = deepcopy(edep.Clone("norm_%s"%rfile))
-	     for bini in range(1, edep.GetNbinsX()+1):
-		norm.SetBinContent(bini, thickness)
-	     edep.Divide(norm)
 	     edep.Scale(1.0/(edep.GetMaximum()))
 
              color = index if index not in [0, 5, 10] else index+1 
-
-	     edep.SetBinContent(edep.GetNbinsX() + 1, 0)
+	     edep.Draw("hist same p")
+	
+	     edep.SetMaximum(1.2)
       	     edep.SetMinimum(0)
       	     edep.SetMarkerColor(color)
 	     edep.SetMarkerStyle(20)
@@ -94,7 +88,7 @@ def draw_histos_ex1(env_variables):
       	     edep.GetYaxis().SetLabelSize(0.03)
       	     edep.GetXaxis().SetLabelSize(0.03)
 
-	     edep.Draw("hist same p")	
+	     	
 	#    inputs/ex1/silicon_107p29um_100MeV_electrons.root 
       	     entryName = "t = %3.2f #mum"%thickness      
       	     l1.AddEntry(edep, entryName, "p")

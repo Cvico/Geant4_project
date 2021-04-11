@@ -19,9 +19,9 @@ def set_exercise_config(exercise):
     return 
 
 def get_histograms(rfile):
+    
     f = r.TFile.Open(rfile)
     histos = f.Get("histograms")
-                          
     ret_histos = { key.GetName() : #hist_name  
          deepcopy(histos.Get(key.GetName())) for key in histos.GetListOfKeys() }
     f.Close()
@@ -47,7 +47,6 @@ if __name__ == "__main__":
     set_exercise_config(env_variables["exercise"])    
     # Get a list of all the rootfiles in the given path
     list_rfiles = [ "/".join([env_variables["path"], rfile]) for rfile in os.listdir(env_variables["path"]) if (".root" in rfile) == True ]
-    
     # Get a dictionary with the histograms contained in the rootfiles
     set_histograms_dict( list_rfiles if len(list_rfiles) != 1 else list_rfiles[0] )
     
