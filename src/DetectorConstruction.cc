@@ -40,12 +40,23 @@ void DetectorConstruction::setTargetMaterial(const G4String matname){
 void DetectorConstruction::setTargetThickness(G4double targetThickness){ fTargetThickness = targetThickness; }
 
 void DetectorConstruction::buildSolidWorld(){
-  fSolidWorld= new G4Box("solid-world", fWorldXsize, fWorldYsize, fWorldZsize);
+  fSolidWorld= new G4Box("solid-world", 0.5*fWorldXsize, 0.5*fWorldYsize, 0.5*fWorldZsize);
   return;
 }
 
 void DetectorConstruction::buildLogicalWorld(){
-  fLogicalWorld = new G4LogicalVolume(fSolidWorld, fTargetMaterial, "logical-world");
+// I. CREATE MATERIALS:
+//     // (note that we use fixed material here one could use messenger to set them)
+//         // 1. Material for the world: low density hydrogen defined by "hand"
+  G4double zet      = 1.0;
+  G4double amass    = 1.01*CLHEP::g/CLHEP::mole;
+  G4double density  = CLHEP::universe_mean_density;
+  G4double pressure = 3.e-18*CLHEP::pascal;
+  G4double tempture = 2.73*CLHEP::kelvin;
+  G4Material* materialWorld  = new G4Material("Galactic", zet, amass, density,
+                                                         kStateGas, tempture, pressure);
+
+  fLogicalWorld = new G4LogicalVolume(fSolidWorld, materialWorld, "logical-world");
   return;
 }
 
@@ -62,7 +73,7 @@ void DetectorConstruction::buildPhysicalWorld(){
 }
 
 void DetectorConstruction::buildSolidTarget(){
-  fTargetSolid = new G4Box("solid-target", fTargetXsize, fTargetYsize, fTargetZsize);
+  fTargetSolid = new G4Box("solid-target", 0.5*fTargetXsize, 0.5*fTargetYsize, 0.5*fTargetZsize);
   return;
 }
 
@@ -94,16 +105,17 @@ G4VPhysicalVolume* DetectorConstruction::Construct() {
   setGunXPosition(-0.25*(fWorldXsize + fTargetThickness));  
   setGunYPosition(0.0);  
   setGunZPosition(0.0);  
+
   // Create worlds
   buildSolidWorld();
   buildLogicalWorld();
   buildPhysicalWorld();
 
+  // Create targets:
   buildSolidTarget();
   buildLogicalTarget();
   buildPhysicalTarget();
 
-  // Create targets:
   return fWorldPhysical;
 }
 

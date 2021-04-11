@@ -6,10 +6,13 @@
 #include "G4ParticleTable.hh"
 #include <math.h>
 
-PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det){
-    // create the particle-gun object
-    fDetector    = det;
-    fParticleGun = new G4ParticleGun();
+PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
+:   G4VUserPrimaryGeneratorAction(),
+    fDetector(det),
+    fParticleGun(nullptr){
+    
+    G4int nParticle = 1;
+    fParticleGun = new G4ParticleGun(nParticle);
     SetDefaultKinematic();
 }
 
@@ -27,11 +30,10 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* evt) {
 void PrimaryGeneratorAction::SetDefaultKinematic() {
 //
 // default primary particle: 30 [MeV] e- perpendicular to the target
-   UpdateDefinition("e-");
-   UpdateMomentumDirection( G4ThreeVector(1., 0., 0.) );
-   UpdateEnergy( 30.*CLHEP::MeV );
-   UpdateMomentum(fParticleGun->GetParticleMomentum());
-   UpdateNumberOfParticles(1);
+   G4ParticleDefinition* part = G4ParticleTable::GetParticleTable()->FindParticle( "e-" );
+   fParticleGun->SetParticleDefinition( part );
+   fParticleGun->SetParticleMomentumDirection( G4ThreeVector(1., 0., 0.) );
+   fParticleGun->SetParticleEnergy( 30.*CLHEP::MeV );
    UpdatePosition();
 }
 
@@ -42,26 +44,12 @@ void PrimaryGeneratorAction::UpdateDefinition(G4String partname){
    G4ParticleDefinition* part = G4ParticleTable::GetParticleTable()->FindParticle( partname );
    fParticleGun->SetParticleDefinition( part );
 }
+
 void PrimaryGeneratorAction::UpdatePosition() {
     fParticleGun->SetParticlePosition( 
-        G4ThreeVector( fDetector->GetGunXPosition(), fDetector->GetGunYPosition(), fDetector->GetGunZPosition() ) );
+        G4ThreeVector( fDetector->GetGunXPosition(), 0, 0 ) );
 }
 
-void PrimaryGeneratorAction::UpdateMomentum(G4double momentum) {
-    fParticleGun->SetParticleMomentum(momentum);
-}
-
-void PrimaryGeneratorAction::UpdateMomentumDirection(G4ThreeVector momentumDir) {
-    fParticleGun->SetParticleMomentumDirection(momentumDir);
-}
-
-void PrimaryGeneratorAction::UpdateNumberOfParticles(G4int nparticles){
-    fParticleGun->SetNumberOfParticles(nparticles);
-}
-
-void PrimaryGeneratorAction::UpdateEnergy(G4double partEnergy){
-    fParticleGun->SetNumberOfParticles(partEnergy);
-}
 
 const G4String& PrimaryGeneratorAction::GetParticleName() const {
 	return fParticleGun->GetParticleDefinition()->GetParticleName();

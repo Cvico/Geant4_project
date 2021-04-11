@@ -31,8 +31,8 @@ RunAction::RunAction(PrimaryGeneratorAction* prim)
   //
 
   // Creating histograms
-  analysisManager->CreateH1("Edep","Edep in target", 100, 0., 20*keV);
-  analysisManager->CreateH1("trackL","trackL in target", 100, 0., 20*cm);
+  analysisManager->CreateH1("Edep","Edep in target", 100, 0., 100*keV);
+  analysisManager->CreateH1("trackL","trackL in target", 100, 0., 100*cm);
 
   // Creating ntuple
   //
