@@ -36,8 +36,8 @@
 # ==============================================================================  
 # set the particle energy to match the experimental one: 100 MeV
 /gun/energy 100 MeV
-# set the particle type to match the experimental one: electron
-/gun/particle electron
+# set the particle type to match the experimental one: e-
+/gun/particle e-
 
 # ------------------------------------------------------------------------------
 # report progress of the simulation at each 100 000 -th event
