@@ -62,8 +62,7 @@ def draw_meroli_comp(env_variables):
    sim.SetLineColor(r.kRed)
    print(sim.Integral())
 
-   sim.Scale(meroli.Integral()/sim.Integral())
-   print(meroli.Integral())
+   sim.Scale(meroli_gr.Integral()/sim.Integral(), "width")
    
    sim.SetMarkerColor(r.kBlack)	
 #   print([sim.GetBinContent(bini) for bini in range(1, 1+sim.GetNbinsX())]) 
@@ -74,6 +73,7 @@ def draw_meroli_comp(env_variables):
 
    sim.SetTitle("")
    sim.SetMinimum(0)
+   sim.SetMaximum(meroli.GetMaximum()*1.2)
    sim.GetXaxis().SetTitle("E(MeV)")
    sim.GetYaxis().SetTitle("Events")
    sim.GetYaxis().SetTitleOffset(1.3)
@@ -94,7 +94,7 @@ def draw_meroli_comp(env_variables):
 def draw_header():
    H = r.TLatex()
    H.SetTextSize(0.07)                                                    	 
-   H.DrawLatexNDC(0.1, 0.95,"#font[22]{FPFE} | #font[12]{Academic}")
+   H.DrawLatexNDC(0.1, 0.91,"#font[22]{FPFE} | #font[12]{Academic}")
 
    return
 
