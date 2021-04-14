@@ -21,6 +21,7 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detector)
 : G4VUserActionInitialization() { 
   fDetector = detector;   
 } 
+
 void ActionInitialization::Build() const {
 
     PrimaryGeneratorAction* primaryAction = new PrimaryGeneratorAction(fDetector);

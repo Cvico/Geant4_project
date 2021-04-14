@@ -2,7 +2,6 @@
 #include "DetectorConstruction.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "G4Run.hh"
-
 #include "G4RunManager.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
@@ -12,7 +11,15 @@ RunAction::RunAction(PrimaryGeneratorAction* prim)
   :   G4UserRunAction(),
       fPrimary(prim) 
 {
+  // Initialize the messenger
+  createHistos();
+}
 
+RunAction::~RunAction() { 
+  /* histo manager must be deleted here then*/ 
+  delete G4AnalysisManager::Instance();
+}
+void RunAction::createHistos(){
   // set printing event number per each event
   G4RunManager::GetRunManager()->SetPrintProgress(1);
 
@@ -31,8 +38,8 @@ RunAction::RunAction(PrimaryGeneratorAction* prim)
   //
 
   // Creating histograms
-  analysisManager->CreateH1("Edep","Edep in target", 496, 0., 100*keV);
-  analysisManager->CreateH1("trackL","trackL in target", 496, 0., 100*cm);
+  analysisManager->CreateH1("Edep","Edep in target", 100, 0., 100.);
+  analysisManager->CreateH1("trackL","trackL in target", 100, 0., 60*cm);
 
   // Creating ntuple
   //
@@ -41,12 +48,6 @@ RunAction::RunAction(PrimaryGeneratorAction* prim)
   analysisManager->CreateNtupleDColumn("trackL");
   analysisManager->FinishNtuple();
 }
-
-RunAction::~RunAction() { 
-  /* histo manager must be deleted here then*/ 
-  delete G4AnalysisManager::Instance();
-}
-
 
 void RunAction::BeginOfRunAction(const G4Run* /*run*/) {
   // Make sure that the Gun position is correct: the user can change the target

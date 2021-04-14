@@ -100,8 +100,6 @@ int main(int argc, char** argv){
     // Initialize the runManager
     runManager->Initialize();
 
-    //G4EventManager::GetEventManager()->GetTrackingManager()->SetVerboseLevel(1);
-    //runManager->BeamOn(10);
 
     
     delete runManager;

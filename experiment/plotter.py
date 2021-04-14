@@ -52,10 +52,11 @@ def draw_meroli_comp(env_variables):
    c = create_canvas("ex1")
    l = create_legend()
 
-   meroli = env_variables["ret_histograms"]["Meroli"]
-   sim = env_variables["ret_histograms"]["YourApplication"]
    
-  # meroli.Draw("hist p")
+   meroli = env_variables["ret_histograms"]["Meroli"]
+   sim = env_variables["ret_histograms"]["silicon_5p6um_100MeV_electron"]
+   print([sim.GetBinContent(bini) for bini in range(1, 1+sim.GetNbinsX())]) 
+ 
    meroli_gr = r.TGraph(meroli)
    sim.Draw("hist")
    meroli_gr.Draw("l same") 
@@ -65,7 +66,6 @@ def draw_meroli_comp(env_variables):
    sim.Scale(meroli_gr.Integral()/sim.Integral(), "width")
    
    sim.SetMarkerColor(r.kBlack)	
-#   print([sim.GetBinContent(bini) for bini in range(1, 1+sim.GetNbinsX())]) 
 
    
    meroli_gr.SetLineColor(r.kBlack)

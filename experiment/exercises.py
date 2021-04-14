@@ -35,13 +35,14 @@ def fill_histos(var):
     env_variables["ret_histograms"] = {}
 
     for index, s in enumerate(samples):
-#	forCopy = deepcopy(env_variables["histograms"]["Meroli"].Clone("%s_%s_toFill"%(var, s)))
 
-	forCopy = deepcopy(env_variables["hists_to_fill"][var].Clone("%s_%s_toFill"%(var, s)))
+        forCopy = deepcopy(env_variables["hists_to_fill"][var].Clone("%s_%s_toFill"%(var, s)))
         h = histos[s][var] if s != "Meroli" else histos[s]
-        if s == "Meroli":
+	
+	if s == "Meroli": # This is a special case
 		env_variables["ret_histograms"][s] = deepcopy(h.Clone("%s_%s"%(var, s)))
 		continue
+
 	for bini in range(1, h.GetNbinsX()+1):
  		forCopy.SetBinContent(bini, 0)
 		forCopy.Fill(h.GetBinCenter(bini), h.GetBinContent(bini))
@@ -49,6 +50,7 @@ def fill_histos(var):
 	# Store a copy
 	env_variables["ret_histograms"][s] = deepcopy(forCopy.Clone("%s_%s"%(var, s)))
 	del forCopy
+
     return
 
 def run_exercise(exercise):

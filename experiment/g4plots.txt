@@ -5,6 +5,6 @@
 # The structure is:
 
 # name : [nbins, xmin, xmax] : X_axis_Title, Y_axis_Title
-Edep   : [124, 0, 0.006] ; E(MeV) , Events
+Edep   : [100, 0, 0.1] ; E(MeV) , Events
 trackL : [124, 0, 19]   ; x(#mum) , Events
 

@@ -2,7 +2,6 @@
 #define RUNACTION_HH
 
 #include "G4UserRunAction.hh"
-
 #include "G4String.hh"
 
 // forward declarations
@@ -33,6 +32,7 @@ class RunAction : public G4UserRunAction {
     //  - detector construction object is used in the stepping action to check target
     //  - primary generator is used to re-set position for workers and to get E0 (set only for workers)
     RunAction(PrimaryGeneratorAction* prim = nullptr);
+    void createHistos();
     virtual ~RunAction();
 
     // Virtual method that is called by the RunManager before the first event starts
@@ -43,8 +43,8 @@ class RunAction : public G4UserRunAction {
 
   // Data member declarations:
   private:
+	  PrimaryGeneratorAction*  fPrimary;     
 
-  	PrimaryGeneratorAction*  fPrimary;     
 };
 
 #endif
