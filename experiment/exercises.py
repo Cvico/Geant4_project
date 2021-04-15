@@ -39,33 +39,75 @@ def fill_histos(var):
         forCopy = deepcopy(env_variables["hists_to_fill"][var].Clone("%s_%s_toFill"%(var, s)))
         h = histos[s][var] if s != "Meroli" else histos[s]
 	
-	if s == "Meroli": # This is a special case
-		env_variables["ret_histograms"][s] = deepcopy(h.Clone("%s_%s"%(var, s)))
-		continue
-
 	for bini in range(1, h.GetNbinsX()+1):
- 		forCopy.SetBinContent(bini, 0)
 		forCopy.Fill(h.GetBinCenter(bini), h.GetBinContent(bini))
-
-	# Store a copy
+       
+	 # Store a copy
 	env_variables["ret_histograms"][s] = deepcopy(forCopy.Clone("%s_%s"%(var, s)))
 	del forCopy
 
     return
 
+def fit_meroli(fitType):
+
+    mer = env_variables["histograms"]["Meroli"]
+    xmin, xmax = mer.GetXaxis().GetXmin(), mer.GetXaxis().GetXmax() 
+    p0_init = max(mer.GetY())/2.0
+    if fitType == "convolved":
+       nPars = 5
+
+       p1_init = 0.9
+       p2_init = 0.3
+       p3_init = 2.56 
+       p4_init = 0.9 
+       
+       fitFCN_conv = r.TF1Convolution("landau", "gausn", xmin, xmax, True)
+       fitFCN_conv.SetRange(xmin, xmax)
+       fitFCN_conv.SetNofPointsFFT(1000)
+       fitFCN = r.TF1(fitType, fitFCN_conv, xmin, xmax, fitFCN_conv.GetNpar())
+       fitFCN.SetParameters(p0_init, p1_init, p2_init, p3_init, p4_init)
+     
+    if fitType == "landau":   
+       nPars = 3
+       p1_init = 2.56 
+       p2_init = 0.9 
+       fitFCN = r.TF1(fitType, fitType, xmin, xmax) 
+       fitFCN.SetParameters(p0_init, p1_init, p2_init)
+
+    if fitType == "gausn":
+       nPars = 3
+       p1_init = 1.0
+       p2_init = 0.0
+       fitFCN = r.TF1(fitType, fitType, xmin, xmax) 
+       fitFCN.SetParameters(p0_init, p1_init, p2_init)
+
+    fitResult = mer.Fit(fitType, "BS", "", xmin, xmax )
+    fitResult = mer.Fit(fitFCN, "B", "", xmin, xmax )
+
+    fits = [mer.GetFunction(fitType).GetParameter(i) for i in range(0, nPars)]
+    return (fitFCN, fits)
+
 def run_exercise(exercise):
     # === First of all, read the txt which has the information about the histograms that will be filled
-    create_histos()
+    env_variables["histograms"] = {}
+    env_variables["fitFuncs"] = {}
+    env_variables["path"] = "./experiment/inputs/ex%s/"%exercise
+    env_variables["outpath"] = "./experiment/results/ex%s/"%exercise
 
-    if exercise == "1":
-	env_variables["path"] = "./experiment/inputs/ex1/"
-	env_variables["outpath"] = "./experiment/results/ex1/"
-	
+       
     list_rfiles = [ "/".join([env_variables["path"], rfile]) for rfile in os.listdir(env_variables["path"]) if (".root" in rfile) == True ]
     set_histograms_dict( list_rfiles if len(list_rfiles) != 1 else list_rfiles[0] )
-    env_variables["histograms"]["Meroli"] = get_histo_meroli() if exercise == "1" else None
+    
+    if exercise == "1":
+	env_variables["histograms"]["Meroli"] = get_histo_meroli() 	
+        env_variables["fitFuncs"]["Landau"] = fit_meroli("landau")
+	env_variables["fitFuncs"]["Gaussn"] = fit_meroli("gausn")
+	env_variables["fitFuncs"]["convolved"] = fit_meroli("convolved")
 
-    fill_histos("Edep")
+#    if exercise == "2":
+ #       create_histos()
+#	fill_histos("Edep")
+
     return 
 
 def get_histo_meroli():
@@ -76,20 +118,19 @@ def get_histo_meroli():
   
    data_bins = [(float(line.split(" ")[0]), float(line.split(" ")[1].split("\n")[0])) for line in data.readlines() if "#" not in line[0] ]
     
-   x_bins_data = [el[0]/1000 for el in data_bins]
+   x_bins_data = [el[0] for el in data_bins]
    x_bins_data = np.asarray(x_bins_data)
    
    y_bins_data = [el[1] for el in data_bins]
    y_bins_data = np.asarray(y_bins_data)
    
-   h_data  = r.TH1D("data_meroli", "", len(x_bins_data)-1, x_bins_data)
-   
+   gr_data = r.TGraph(len(x_bins_data)) 
    for bini in range(len(x_bins_data)):
-	h_data.Fill(x_bins_data[bini], y_bins_data[bini])
+	gr_data.SetPoint(bini, x_bins_data[bini], y_bins_data[bini])
   
    data.close()
    sim.close()
-   return h_data
+   return gr_data 
 
 
 def get_histograms(rfile):
@@ -108,11 +149,14 @@ def set_histograms_dict(rfiles):
     custom environmental variable
     '''
     if isinstance(rfiles, list):	
-	h_dict = { re.match("^(.*)/(.*).root$", rfile).groups()[1] : get_histograms(rfile) for rfile in rfiles }
-    else:
-	h_dict = {rfiles.split(".root")[0].split(env_variables["path"])[1].split("/")[1] : get_histograms(rfiles)}
+	for rfile in rfiles:
+	   filename =  re.match("^(.*)/(.*).root$", rfile).groups()[1]
+	   env_variables["histograms"][ filename ] = get_histograms(rfile)
 
-    env_variables["histograms"] = h_dict
+    else:
+	filename = rfiles.split(".root")[0].split(env_variables["path"])[1].split("/")[1] 
+	env_variables["histograms"][ filename ] = get_histograms(rfiles)
+
     return 
 
 
@@ -124,4 +168,6 @@ if __name__ == "__main__":
 
     g4plt.draw_histos(env_variables)
 
-    os.system("cp -r ./experiment/results/ex1 ~/www/private/FPFE/")
+    os.system("cp -r ./experiment/results/ex%s/* ~/www/private/FPFE/"%env_variables["exercise"])
+
+

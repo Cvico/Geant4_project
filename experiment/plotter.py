@@ -18,16 +18,35 @@ def get_dims(opt):
         topx, topy, ww, wh = 10, 10, 1000, 800
         return ( topx, topy, ww, wh ) # last 2 for printing with 2 pads
     if opt == "legend":
-        fLegX1, fLegY1, fLegX2, fLegY2 = 0.55, 0.55, 0.89, 0.89
+        fLegX1, fLegY1, fLegX2, fLegY2 = 0.55, 0.69, 0.89, 0.89
         legendTextSize = 0.035
         return( fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize )
 
 
-def create_canvas(name):
+def create_canvas(name, nPads = 1):
     # Size of the Canvas
     # ------------------------    
     topx, topy, ww, wh = get_dims("canvas")
+    
     c = r.TCanvas( 'c_' + name, '', topx, topy, ww, wh )
+    
+    if nPads == 2:
+       c.Divide(1, 2)
+       p1 = c.GetPad(1)
+            
+       p1.SetPad(0, 0.35, 1, 0.95)
+       p1.SetTopMargin(0.1)
+       p1.SetBottomMargin(0.02)
+       
+       p2 = c.GetPad(2)
+       p2.SetPad(0, 0.1, 1, 0.35)
+       p2.SetTopMargin(0.1)
+       p2.SetBottomMargin(0.2)
+       
+        
+#       p1.SetGrid()
+       p2.SetGrid()
+    
     return c
 
 
@@ -42,6 +61,8 @@ def create_legend():
 
 def draw_histos(env_variables):
     if env_variables["exercise"] == "1": draw_meroli_comp(env_variables)
+    if env_variables["exercise"] == "2": draw_histos_ex2(env_variables)
+
     return
 
 def draw_meroli_comp(env_variables):
@@ -49,42 +70,81 @@ def draw_meroli_comp(env_variables):
 	Very simple function to plot the comparison with Meroli and some other plots
    '''
    outpath = env_variables["outpath"]
-   c = create_canvas("ex1")
+   c = create_canvas("ex1", nPads = 2)
+   p1 = c.GetPad(1)
+   p2 = c.GetPad(2)
+
    l = create_legend()
-
-   
-   meroli = env_variables["ret_histograms"]["Meroli"]
-   sim = env_variables["ret_histograms"]["silicon_5p6um_100MeV_electron"]
-   print([sim.GetBinContent(bini) for bini in range(1, 1+sim.GetNbinsX())]) 
  
-   meroli_gr = r.TGraph(meroli)
-   sim.Draw("hist")
-   meroli_gr.Draw("l same") 
-   sim.SetLineColor(r.kRed)
-   print(sim.Integral())
-
-   sim.Scale(meroli_gr.Integral()/sim.Integral(), "width")
+   meroli_gr = env_variables["histograms"]["Meroli"]
+   sim = env_variables["histograms"]["silicon_5p6um_100MeV_electron"]["Edep"] 
    
+   fitFCN_conv, fits_conv = env_variables["fitFuncs"]["convolved"]
+   fitFCN_conv.SetParameters(fits_conv[0], fits_conv[1], fits_conv[2], fits_conv[3], fits_conv[4])
+
+   fitFCN_conv.SetLineColor(r.kOrange+8)
+   fitFCN_conv.SetLineStyle(9)
+
+   fitFCN_landau, fits_landau = env_variables["fitFuncs"]["Landau"]
+   fitFCN_landau.SetParameters(fits_landau[0], fits_landau[1], fits_landau[2])
+
+   fitFCN_landau.SetLineColor(r.kTeal+5)
+   fitFCN_landau.SetLineStyle(1)
+
+   p1.cd()
+
+   meroli_gr.Draw("la") 
+   sim.Draw("hist same")
+
+   fitFCN_conv.Draw("l same")
+   fitFCN_landau.Draw("l same")
+   sim.SetLineColor(r.kAzure+2)
+   sim.SetLineWidth(3) 
+   sim.Scale(meroli_gr.Integral()/sim.Integral(), "width")
    sim.SetMarkerColor(r.kBlack)	
 
-   
+    
    meroli_gr.SetLineColor(r.kBlack)
-#   meroli_gr.SetLineStyle(20)
 
-   sim.SetTitle("")
-   sim.SetMinimum(0)
-   sim.SetMaximum(meroli.GetMaximum()*1.2)
-   sim.GetXaxis().SetTitle("E(MeV)")
-   sim.GetYaxis().SetTitle("Events")
-   sim.GetYaxis().SetTitleOffset(1.3)
-   sim.GetYaxis().SetLabelSize(0.03)
-   sim.GetXaxis().SetLabelSize(0.03)
+   meroli_gr.SetTitle("")
+   meroli_gr.SetMinimum(0)
+   meroli_gr.GetXaxis().SetRangeUser(0, meroli_gr.GetXaxis().GetXmax())
+   meroli_gr.SetMaximum(max(meroli_gr.GetY())*1.2)
+   meroli_gr.GetYaxis().SetTitle("Events")
+   meroli_gr.GetYaxis().SetTitleOffset(1.3)
+   meroli_gr.GetYaxis().SetLabelSize(0.03)
+   meroli_gr.GetXaxis().SetLabelSize(0)
  
-   l.AddEntry(meroli, "Data", "l")
+
+   l.AddEntry(meroli_gr, "Data", "l")
    l.AddEntry(sim, "FPFE simulation", "l")
- 
+   l.AddEntry(fitFCN_conv, "Convolved fit", "l")
+   l.AddEntry(fitFCN_landau, "Landau fit", "l")
    l.Draw("same")
+
    draw_header()   
+
+   p2.cd()
+   ratio = deepcopy(sim.Clone("ratioHist"))
+   for bini in range(1, ratio.GetNbinsX()+1):
+	bincontent = (meroli_gr.GetY()[bini-1]-sim.GetBinContent(bini))/meroli_gr.GetY()[bini-1]
+	ratio.SetBinContent(bini, bincontent)
+	ratio.SetBinError(bini, sim.GetBinError(bini))
+
+   ratio.GetXaxis().SetTitle("E(keV)")
+   ratio.GetYaxis().SetTitle("#frac{Data - simulation}{Data}")
+   ratio.GetYaxis().SetRangeUser(-1.2, 1.2)
+   ratio.SetMarkerStyle(20)
+   ratio.SetTitle("")
+   ratio.GetYaxis().SetLabelSize(0.09) 
+   ratio.GetXaxis().SetLabelSize(0.09) 
+   ratio.GetYaxis().SetTitleSize(0.08)
+   ratio.GetXaxis().SetTitleSize(0.13)
+   ratio.GetYaxis().SetTitleOffset(0.55)
+
+   ratio.Draw("hist p")
+   ratio.SetMarkerSize(1)
+
    make_path(outpath)
    c.Print(outpath + "/%s.png"%( "Meroli_comp"), 'png') 
    c.Print(outpath + "/%s.pdf"%( "Meroli_comp" ), 'pdf')
@@ -99,51 +159,46 @@ def draw_header():
    return
 
 def draw_histos_ex2(env_variables):
-   histos  = env_variables["histograms"]
-   samples = env_variables["AnalysedFiles"] 
- 
-   outpath = env_variables["outpath"]	 
+   histos  = [ deepcopy(env_variables["histograms"][key]["Edep"].Clone(key)) for key in env_variables["histograms"].keys() ]
+
+   outpath = env_variables["outpath"]
    make_path(outpath)
- 
-   xtitles = {"proton"  : "E(GeV)",
-	      "electron": "E(MeV)" }
+
+   c = create_canvas("ex2")
+   l = create_legend()
+
    
-   for part in ["proton", "electron"]:	
-      c = create_canvas("edep_" + part)
+   for index, h in enumerate(histos):
+      filelist = re.match("(.*)_(.*)(um)_(.*)_(.*)", h.GetName()).groups()
+      thickness =  filelist[1].replace("p", ".")
+
+
+      h.Scale(1.0/(h.Integral()))
       
-      l1 = create_legend()      
-      for index, rfile in enumerate(samples):
-         if part not in rfile: continue
-         edep   = histos[rfile]["Edep"]
+      color = index+1 if index not in [0, 5, 10] else index+1 
+      h.Draw("hist same")
+            
+      h.SetMaximum(0.5)  
+      h.SetLineWidth(3) 
+      h.GetXaxis().SetRangeUser(0, 60)
+      h.SetMinimum(0)
+      h.SetLineColor(color)
+      h.SetTitle("")
+      h.GetXaxis().SetTitle("E (keV)")
+      h.GetYaxis().SetTitle("Normalized Events")
+      h.GetYaxis().SetTitleOffset(1.3)
+      h.GetYaxis().SetLabelSize(0.03)
+      h.GetXaxis().SetLabelSize(0.03)
 
-         if (edep.GetMaximum() == 0.0): continue
-         thickness = float(re.match("(.*)_(.*)(um)_(.*)_(.*)", rfile).groups()[1].replace("p", "."))
-         edep.Scale(1.0/(edep.GetMaximum()))
-
-         color = index if index not in [0, 5, 10] else index+1 
-         edep.Draw("hist same p")
+      entryName = "E = %s #mum"%thickness
       
-         edep.SetMaximum(1.2)
-         edep.SetMinimum(0)
-         edep.SetMarkerColor(color)
-         edep.SetMarkerStyle(20)
-         edep.SetMarkerSize(1)
-         edep.SetTitle("")
-         
-         edep.GetXaxis().SetTitle(xtitles[part])
-         edep.GetYaxis().SetTitle("Normalized Events")
-         edep.GetYaxis().SetTitleOffset(1.3)
-         edep.GetYaxis().SetLabelSize(0.03)
-         edep.GetXaxis().SetLabelSize(0.03)
+      l.AddEntry(h, entryName, "l")
 
-           	
-      #    inputs/ex1/silicon_107p29um_100MeV_electrons.root 
-         entryName = "t = %3.2f #mum"%thickness      
-         l1.AddEntry(edep, entryName, "p")
-      l1.Draw("same") 
-      c.Print(outpath + "/%s.png"%( part ), 'png') 
-      c.Print(outpath + "/%s.pdf"%( part ), 'pdf')
+   draw_header()
+   l.Draw("same") 
 
+   c.Print(outpath + "/%s.png"%( "electron_Thicknesses"), 'png') 
+   c.Print(outpath + "/%s.pdf"%( "electron_Thicknesses" ), 'pdf')
    return
 
 
