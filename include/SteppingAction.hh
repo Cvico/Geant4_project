@@ -8,12 +8,6 @@ class DetectorConstruction;
 class EventAction;
 class G4VPhysicalVolume;
 
-/**
- * @brief In UserSteppingAction() the energy deposit and
- * @brief track lengths of charged particles in each step 
- * @brief in the Absorber and Gap layers are collected and 
- * @brief subsequently recorded in B4aEventAction
- */
 class SteppingAction : public G4UserSteppingAction {
 
   // Method declaration:

@@ -3,7 +3,7 @@
 #include "G4VUserActionInitialization.hh"
 #include "DetectorConstruction.hh"
 #include "PrimaryGeneratorAction.hh"
-
+#include "CalorimeterConstruction.hh"
 
 
 class DetectorConstruction;
@@ -18,7 +18,7 @@ public:
     virtual void BuildForMaster() const; // Only use in multithread mode.
 
 private:
-    DetectorConstruction *fDetector;
+    DetectorConstruction*fDetector;
 
 
 };

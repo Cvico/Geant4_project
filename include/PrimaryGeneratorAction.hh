@@ -3,6 +3,7 @@
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "globals.hh"
+#include "CalorimeterConstruction.hh"
 #include "G4ParticleMomentum.hh"
 // forward declaration
 class DetectorConstruction;
@@ -20,6 +21,7 @@ class G4String;
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   // Method declaration:
   public:
+    PrimaryGeneratorAction();
     PrimaryGeneratorAction(DetectorConstruction* det);
     virtual ~PrimaryGeneratorAction();
 
