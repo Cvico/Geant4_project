@@ -6,12 +6,6 @@
 
 
 
-/**
- * @brief This is the abstract base class for instantiating all the user action classes. 
- * @brief It has a pure virtual method Build() which is invoked by G4RunManager for sequential execution 
- * @brief and G4WorkerRunManager for multi-threaded execution. The additional virtual method BuildForMaster() 
- * @brief will be invoked from G4MTRunManager for multi-threaded execution.
- */
 class DetectorConstruction;
 
 class ActionInitialization : public G4VUserActionInitialization {
@@ -21,6 +15,7 @@ public:
     virtual ~ActionInitialization(){};
 
     virtual void Build() const;
+    virtual void BuildForMaster() const; // Only use in multithread mode.
 
 private:
     DetectorConstruction *fDetector;

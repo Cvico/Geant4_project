@@ -6,21 +6,17 @@
 #include "G4RunManager.hh"
 
 
-/*
-                                                BRIEF DESCRIPTION
-------------------------------------------------------------------------------------------------------------------------------------------
-Geant4 has two user initialization classes and one user action class whose methods the user must override in order to implement a 
-simulation. They require the user to define the detector, specify the physics to be used, and define how initial particles are to 
-be generated. These classes are described in Mandatory User Actions and Initializations.
 
-FIND MORE INFORMATION AT
-https://geant4-userdoc.web.cern.ch/UsersGuides/ForApplicationDeveloper/html/UserActions/mandatoryActions.html
-------------------------------------------------------------------------------------------------------------------------------------------
-*/
 ActionInitialization::ActionInitialization(DetectorConstruction* detector)  
 : G4VUserActionInitialization() { 
   fDetector = detector;   
-} 
+}
+
+// Only used in multithread mode
+void ActionInitialization::BuildForMaster() const
+{
+  SetUserAction(new RunAction);
+}
 
 void ActionInitialization::Build() const {
 

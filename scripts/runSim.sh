@@ -26,6 +26,7 @@ runExercise() {
 	OUTPUTNAME=$(echo $f | awk -F'.mac' '{print $1}')
         ./main $MACROSPATH/$f
 	cp ./main.root $OUTPUTFOLDER/$OUTPUTNAME.root
+
     done
     echo -e "[COMPILING MSG] ========= FINISHING SIMULATION ========"
     # Return to the previous folder
@@ -45,8 +46,10 @@ compile () {
     cd $buildFolder
 
     # Compile libraries
-    cmake3 -DGeant4_DIR=$G4COMP ../
+    cmake -DGeant4_DIR=$G4COMP ../
     make
+
+    cd ..
 }
 
 if [[ $MODE == 1 ]]; then

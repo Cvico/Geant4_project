@@ -3,9 +3,12 @@
 #include "PrimaryGeneratorAction.hh"
 #include "G4Run.hh"
 #include "G4RunManager.hh"
+#include "G4MTRunManager.hh"
+#include "G4RootAnalysisManager.hh"
 #include "G4UnitsTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "Analyser.hh"
+#include "G4Threading.hh"
 
 RunAction::RunAction(PrimaryGeneratorAction* prim) 
   :   G4UserRunAction(),
@@ -25,6 +28,7 @@ void RunAction::createHistos(){
 
   // Create analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
+
   G4cout << "Using " << analysisManager->GetType() << G4endl;
 
   // Create directories

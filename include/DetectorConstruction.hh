@@ -3,7 +3,6 @@
 #define DETECTORCONSTRUCTION_HH
 
 #include "G4VUserDetectorConstruction.hh"
-#include "Materials.hh"
 #include "DetectorMessenger.hh"
 #include "G4Box.hh"
 class G4Material;

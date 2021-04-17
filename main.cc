@@ -6,7 +6,6 @@
 #include <iostream>
 #include "G4Types.hh"
 #include "globals.hh"
-#include "G4RunManager.hh"
 #include "G4PhysListFactory.hh"
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
@@ -16,44 +15,32 @@
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
 #include "G4VisManager.hh"
-#include "Materials.hh"
 #include "G4Box.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4PVPlacement.hh"
 
 
+/*  FOR RUNNING IN MULTITHREAD MODE 
 
+    Geant4 multithread mode is set at installing step, so only
+    those who have installed multithread mode will be able to run
+    in multithread mode. Comment or uncomment if you want to switch 
+    between multithread or sequential modes. 
 
-void importMaterials(Materials* obj){
-    // Import all the materials we want to have available for detector
-    // construction. Define here the materials
+    You will also have to comment/uncomment the lines regarding
+    multithreading in the main() function.
+*/
 
-    //  -- See: http://www.apc.univ-paris7.fr/~franco/g4doxy/html/classG4Material.html
-    //  for more information on different constructors.
-    obj->addMaterial("G4_Al");
-    obj->addMaterial("G4_Si");
-    obj->addMaterial(new G4Material("Uranium", 92., 238.03*CLHEP::g/CLHEP::mole, 18.950*CLHEP::g/CLHEP::cm3));
-    obj->addMaterial(new G4Material("air", 1.290*CLHEP::mg/CLHEP::cm3, 2));
-    obj->addMaterial(new G4Material("aerogel", 0.2*CLHEP::g/CLHEP::cm3, 3));
-    obj->addMaterial("G4_lAr");
-    obj->addMaterial("G4_CONCRETE");
-
-    //  -- See: http://www.apc.univ-paris7.fr/~franco/g4doxy/html/classG4Element.html
-    //  for more information on different constructors.
-    obj->addElement(new G4Element("Nytrogen", "N", 7.0, 14.0067*CLHEP::g/CLHEP::mole));
-    obj->addElement(new G4Element("Oxygen", "O", 8.0, 16.0*CLHEP::g/CLHEP::mole));
-    obj->addElement(new G4Element("Hydrogen", "H", 1.0, 1.01*CLHEP::g/CLHEP::mole));
-
-    //  -- See: http://www.apc.univ-paris7.fr/~franco/g4doxy/html/classG4Isotope.html
-    //  for more information on different constructors.
-
-    return;
-}
+// Comment lines from 34-37 and 39 if you want to go sequential
+#ifdef G4MULTITHREADED
+#include "G4MTRunManager.hh"
+#else
+#include "G4RunManager.hh"
+#endif
 
 
 int main(int argc, char** argv){
-
     // Choose the random engine:
     CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
     
@@ -62,10 +49,15 @@ int main(int argc, char** argv){
     if (argc == 1 ){
         ui = new G4UIExecutive(argc, argv, "tcsh");
     }
-    
-    // initialize the runManager
-    G4RunManager* runManager = new G4RunManager();
-    
+
+    // Comment lines from 34-37 and 39 if you want to go sequential
+    #ifdef G4MULTITHREADED
+    G4MTRunManager* runManager = new G4MTRunManager;
+    runManager->SetNumberOfThreads(6);
+    #else
+    G4RunManager* runManager = new G4RunManager;
+    #endif    
+
     // Build your detector
     DetectorConstruction* detector = new DetectorConstruction();
 
@@ -78,13 +70,12 @@ int main(int argc, char** argv){
     G4VModularPhysicsList* pl = physListFactory.GetReferencePhysList( plName );
     runManager->SetUserInitialization( pl ); 
 
-    // Set User action classes
     runManager->SetUserInitialization( new ActionInitialization(detector) );
-    // Initialize the visualisation manager:
+
     G4VisManager* visManager = new G4VisExecutive;
     visManager->Initialize();
     
-      // Detect batch-mode: 
+    // Detect batch-mode: 
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
     UImanager->ApplyCommand("/control/macroPath ../macros/");
     if ( !ui ) {
