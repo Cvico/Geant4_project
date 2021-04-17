@@ -4,7 +4,7 @@
 #include "EventAction.hh"
 #include "SteppingAction.hh"
 #include "G4RunManager.hh"
-
+#include "CalorimeterConstruction.hh"
 
 
 ActionInitialization::ActionInitialization(DetectorConstruction* detector)  

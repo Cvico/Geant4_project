@@ -6,6 +6,8 @@
 #include "G4ParticleTable.hh"
 #include <math.h>
 
+
+
 PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* det)
 :   G4VUserPrimaryGeneratorAction(),
     fDetector(det),
