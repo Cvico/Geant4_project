@@ -62,6 +62,7 @@ def create_legend():
 def draw_histos(env_variables):
     if env_variables["exercise"] == "1": draw_meroli_comp(env_variables)
     if env_variables["exercise"] == "2": draw_histos_ex2(env_variables)
+    if env_variables["exercise"] == "3": draw_histos_ex3(env_variables)
 
     return
 
@@ -200,6 +201,53 @@ def draw_histos_ex2(env_variables):
    c.Print(outpath + "/%s.png"%( "electron_Thicknesses"), 'png') 
    c.Print(outpath + "/%s.pdf"%( "electron_Thicknesses" ), 'pdf')
    return
+
+def draw_histos_ex3(env_variables):
+   histos  = [ deepcopy(env_variables["histograms"][key]["Edep"].Clone(key)) for key in env_variables["histograms"].keys() ]
+#   histos  = [ deepcopy(env_variables["histograms"][key]["trackL"].Clone(key)) for key in env_variables["histograms"].keys() ]
+
+
+   outpath = env_variables["outpath"]
+   make_path(outpath)
+
+   c = create_canvas("ex3")
+   l = create_legend()
+
+   
+   for index, h in enumerate(histos):
+
+      filelist = re.match("(.*)_(.*)_(.*)_(.*)", h.GetName()).groups()
+      material = filelist[0]
+      thickness =  filelist[1].replace("p", ".")
+
+#      h.Scale(1.0/(h.Integral()))
+      
+      color = index+1 if index not in [0, 5, 10] else index+1 
+      h.Draw("hist same")
+            
+#      h.SetMaximum(0.5)  
+      h.SetLineWidth(3) 
+      h.SetMinimum(0)
+      h.SetLineColor(color)
+      h.SetTitle("")
+      h.GetXaxis().SetTitle("E (MeV)/cm")
+      h.GetYaxis().SetTitle("Normalized Events")
+      h.GetYaxis().SetTitleOffset(1.3)
+      h.GetYaxis().SetLabelSize(0.03)
+      h.GetXaxis().SetLabelSize(0.03)
+
+      entryName = " %s "%material
+      
+      l.AddEntry(h, entryName, "l")
+
+   draw_header()
+   l.Draw("same") 
+
+   c.Print(outpath + "/%s.png"%( "%s"%material ), 'png') 
+   c.Print(outpath + "/%s.pdf"%( "%s"%material ), 'pdf')
+   return
+
+
 
 
 

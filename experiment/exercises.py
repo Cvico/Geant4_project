@@ -6,12 +6,7 @@ import argparse
 import plotter as g4plt
 env_variables = { "matching" : "(.*):(.*);(.*),(.*)" }
 
-def add_options():
-    parser = argparse.ArgumentParser(description='Geant4 simulation plotter')
-    parser.add_argument('--exercise', '-e', metavar = 'exercise', help = 'Exercise from the report that we want to reproduce')
-  
-    env_variables["exercise"] = parser.parse_args().exercise
-    return 
+
 
 def create_histos():
     # Read the txt file containing this information
@@ -162,12 +157,13 @@ def set_histograms_dict(rfiles):
 
 # === Main script
 if __name__ == "__main__": 
-    add_options()
- 
+
+    exercise = sys.argv[1]
+    env_variables["exercise"] = str(exercise)
     run_exercise(env_variables["exercise"])
 
     g4plt.draw_histos(env_variables)
 
-    os.system("cp -r ./experiment/results/ex%s/* ~/www/private/FPFE/"%env_variables["exercise"])
+#    os.system("cp -r ./experiment/results/ex%s/* ~/www/private/FPFE/"%env_variables["exercise"])
 
 
