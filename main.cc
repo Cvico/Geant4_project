@@ -1,8 +1,6 @@
 // ================================== //
 //    Author: Carlos Vico Villalba    //
 // ================================== //
-
-
 #include <iostream>
 #include "G4Types.hh"
 #include "globals.hh"
@@ -17,63 +15,66 @@
 #include "G4UIExecutive.hh"
 #include "G4VisExecutive.hh"
 #include "G4VisManager.hh"
-#include "G4Box.hh"
-#include "G4LogicalVolume.hh"
-#include "G4VPhysicalVolume.hh"
-#include "G4PVPlacement.hh"
 
 
-/*  FOR RUNNING IN MULTITHREAD MODE 
 
-    Geant4 multithread mode is set at installing step, so only
-    those who have installed multithread mode will be able to run
-    in multithread mode. Comment or uncomment if you want to switch 
-    between multithread or sequential modes. 
-
-    You will also have to comment/uncomment the lines regarding
-    multithreading in the main() function.
-*/
-
-// Comment lines from 34-37 and 39 if you want to go sequential
-#ifdef G4MULTITHREADED
+// ------------------------------------
 #include "G4MTRunManager.hh"
-#else
 #include "G4RunManager.hh"
-#endif
+// ------------------------------------
+
+
+
+template <typename manager>
+void loadPhysicsList(manager* runManager);
+template <typename manager>
+void runSimulation(manager* runManager, int useDetector, int argc, char** argv);
 
 
 int main(int argc, char** argv){
+    // ---
+    // Detector = 1 --> Meroli's
+    // Detector = 2 --> Calorimeters
+    int useDetector = 1;
+    bool useMultithread = true;
+    int nThreads = 9;
+
+    if (useMultithread){
+        G4MTRunManager* runManager = new G4MTRunManager; 
+        runManager->SetNumberOfThreads(nThreads);
+        runSimulation(runManager, useDetector, argc, argv);
+        }
+
+    else{ 
+        G4RunManager* runManager = new G4RunManager;
+        runSimulation(runManager, useDetector, argc, argv);
+        }
+    
+}
+
+template <typename manager>
+void runSimulation(manager* runManager, int useDetector, int argc, char** argv){
     // Choose the random engine:
     CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
     
     // Detect interactive mode (if no arguments) and define UI: 
     G4UIExecutive* ui=0;
     if (argc == 1 ){
-        ui = new G4UIExecutive(argc, argv, "qt");
+        ui = new G4UIExecutive(argc, argv, "tcsh");
     }
 
-    // Comment lines from 34-37 and 39 if you want to go sequential
-    #ifdef G4MULTITHREADED
-    G4MTRunManager* runManager = new G4MTRunManager;
-    runManager->SetNumberOfThreads(9);
-    #else
-    G4RunManager* runManager = new G4RunManager;
-    #endif    
-
-    // Build your detector
-    //DetectorConstruction* detector = new DetectorConstruction();
-    CalorimeterConstruction* detector = new CalorimeterConstruction();
-    // Initialize the runManager 
-    runManager->SetUserInitialization( detector );
-
-    // Create/obtain a Physics List and register it in the Run-Manager
-    G4PhysListFactory physListFactory;
-    const G4String plName = "FTFP_BERT";
-    G4VModularPhysicsList* pl = physListFactory.GetReferencePhysList( plName );
-    runManager->SetUserInitialization( pl ); 
-    runManager->SetUserInitialization( new CalorimeterActionInitialization() );
-    //runManager->SetUserInitialization( new ActionInitialization(detector) );
-
+    if ( useDetector == 1){ 
+        DetectorConstruction* detector = new DetectorConstruction(); 
+        runManager->SetUserInitialization( detector );
+        loadPhysicsList(runManager);    
+        runManager->SetUserInitialization( new ActionInitialization(detector) );
+        } else { 
+        CalorimeterConstruction* detector = new CalorimeterConstruction(); 
+        runManager->SetUserInitialization( detector );
+        runManager->SetUserInitialization( new CalorimeterActionInitialization() );
+        }
+    
+    // Handle visualization
     G4VisManager* visManager = new G4VisExecutive;
     visManager->Initialize();
     
@@ -90,10 +91,14 @@ int main(int argc, char** argv){
     delete ui;
     }
     
-    // Initialize the runManager
-//    runManager->Initialize();
-    
     delete runManager;
     delete visManager;
-    
+}
+
+template <typename manager>
+void loadPhysicsList(manager* runManager){
+    // Create/obtain a Physics List and register it in the Run-Manager
+    G4PhysListFactory physListFactory;
+    G4VModularPhysicsList* pl = physListFactory.GetReferencePhysList( "FTFP_BERT" );
+    runManager->SetUserInitialization( pl ); 
 }
