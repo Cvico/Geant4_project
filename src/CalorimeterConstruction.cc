@@ -148,7 +148,7 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
                                                        false, 
                                                        0);
   
-  G4Sphere* ECAL = new G4Sphere("ECAL", 1.0*cm, 6.0*cm, 0, 2*PI, 0., PI);                 
+  G4Sphere* ECAL = new G4Sphere("ECAL", 2.0*cm, 6.0*cm, 0, 2*PI, 0., PI);                 
   G4LogicalVolume * ECALLV = new G4LogicalVolume(ECAL, ECALMaterial, "ECAL", 0, 0 ,0);
   new G4PVPlacement(nullptr, 
                     G4ThreeVector(0.0, 0.0, 0.0),
@@ -172,9 +172,9 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
   // Visualization attributes
   //
   
-  worldLV->SetVisAttributes(G4Colour(0.0, 0.0, 1.0));
-  auto simpleBoxVisAtt_ECAL= new G4VisAttributes(G4Colour(1.0, 0.0, 0.0));
-  auto simpleBoxVisAtt_HCAL= new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
+  worldLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  auto simpleBoxVisAtt_ECAL= new G4VisAttributes(G4Colour(0.0, 1.0, 1.0));
+  auto simpleBoxVisAtt_HCAL= new G4VisAttributes(G4Colour(1.0, 1.0, 0.0));
   simpleBoxVisAtt_ECAL->SetVisibility(true);
   simpleBoxVisAtt_HCAL->SetVisibility(true);
   ECALLV->SetVisAttributes(simpleBoxVisAtt_ECAL);
