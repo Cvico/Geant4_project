@@ -7,7 +7,9 @@
 #include "G4Types.hh"
 #include "globals.hh"
 #include "G4PhysListFactory.hh"
+#include "CalorimeterActionInitialization.hh"
 #include "DetectorConstruction.hh"
+#include "CalorimeterConstruction.hh"
 #include "ActionInitialization.hh"
 #include "G4UImanager.hh"
 #include "G4Material.hh"
@@ -47,20 +49,20 @@ int main(int argc, char** argv){
     // Detect interactive mode (if no arguments) and define UI: 
     G4UIExecutive* ui=0;
     if (argc == 1 ){
-        ui = new G4UIExecutive(argc, argv, "tcsh");
+        ui = new G4UIExecutive(argc, argv, "qt");
     }
 
     // Comment lines from 34-37 and 39 if you want to go sequential
     #ifdef G4MULTITHREADED
     G4MTRunManager* runManager = new G4MTRunManager;
-    runManager->SetNumberOfThreads(6);
+    runManager->SetNumberOfThreads(9);
     #else
     G4RunManager* runManager = new G4RunManager;
     #endif    
 
     // Build your detector
-    DetectorConstruction* detector = new DetectorConstruction();
-
+    //DetectorConstruction* detector = new DetectorConstruction();
+    CalorimeterConstruction* detector = new CalorimeterConstruction();
     // Initialize the runManager 
     runManager->SetUserInitialization( detector );
 
@@ -69,8 +71,8 @@ int main(int argc, char** argv){
     const G4String plName = "FTFP_BERT";
     G4VModularPhysicsList* pl = physListFactory.GetReferencePhysList( plName );
     runManager->SetUserInitialization( pl ); 
-
-    runManager->SetUserInitialization( new ActionInitialization(detector) );
+    runManager->SetUserInitialization( new CalorimeterActionInitialization() );
+    //runManager->SetUserInitialization( new ActionInitialization(detector) );
 
     G4VisManager* visManager = new G4VisExecutive;
     visManager->Initialize();
@@ -89,9 +91,7 @@ int main(int argc, char** argv){
     }
     
     // Initialize the runManager
-    runManager->Initialize();
-
-
+//    runManager->Initialize();
     
     delete runManager;
     delete visManager;

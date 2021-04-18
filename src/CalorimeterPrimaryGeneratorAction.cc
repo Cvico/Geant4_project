@@ -32,6 +32,8 @@
 #include "G4LogicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Box.hh"
+#include "G4Tubs.hh"
+#include "G4Sphere.hh"
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
@@ -53,7 +55,7 @@ CalorimeterPrimaryGeneratorAction::CalorimeterPrimaryGeneratorAction()
   auto particleDefinition 
     = G4ParticleTable::GetParticleTable()->FindParticle("e-");
   fParticleGun->SetParticleDefinition(particleDefinition);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
   fParticleGun->SetParticleEnergy(50.*MeV);
 }
 
@@ -74,17 +76,18 @@ void CalorimeterPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   // on DetectorConstruction class we get world volume 
   // from G4LogicalVolumeStore
   //
-  G4double worldZHalfLength = 0.;
+  G4double worldInnerRadius = 0.;
+  
   auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 
   // Check that the world volume has box shape
-  G4Box* worldBox = nullptr;
+  G4Sphere* worldSphere = nullptr;
   if (  worldLV ) {
-    worldBox = dynamic_cast<G4Box*>(worldLV->GetSolid());
+    worldSphere = dynamic_cast<G4Sphere*>(worldLV->GetSolid());
   }
 
-  if ( worldBox ) {
-    worldZHalfLength = worldBox->GetZHalfLength();  
+  if ( worldSphere ) {
+    worldInnerRadius = worldSphere->GetInnerRadius();  
   }
   else  {
     G4ExceptionDescription msg;
@@ -97,7 +100,7 @@ void CalorimeterPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   
   // Set gun position
   fParticleGun
-    ->SetParticlePosition(G4ThreeVector(-worldZHalfLength, 0., 0.));
+    ->SetParticlePosition(G4ThreeVector(worldInnerRadius, 0., 0.));
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }

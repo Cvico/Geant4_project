@@ -29,14 +29,15 @@
 
 #include "G4Material.hh"
 #include "G4NistManager.hh"
-
+#include "G4Sphere.hh"
 #include "G4Box.hh"
+#include "math.h"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4PVReplica.hh"
 #include "G4GlobalMagFieldMessenger.hh"
 #include "G4AutoDelete.hh"
-
+#include "G4Tubs.hh"
 #include "G4SDManager.hh"
 #include "G4SDChargedFilter.hh"
 #include "G4MultiFunctionalDetector.hh"
@@ -117,22 +118,10 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
   // I don't want to use a GAP
   // Geometry parameters
 
-  G4int  nofLayers = 1; // 
+  G4double  absoThickness = 16.*cm;
+  G4double innerRadius = 0;
+  G4double outerRadius = 1.5*absoThickness;
 
-  G4double  absoThickness = 10.*mm;
-  fabsoThickness = absoThickness; // Save it in data-member
-  G4double  ecalSizeXY  = 10.*cm;
-  G4double  hcalSizeXY  = 10.*cm;
-
-  //auto  layerThickness = absoThickness;
-  auto ECALthickness = 0.3*absoThickness;
-  auto HCALthickness = 0.7*absoThickness;
-  
-  auto worldSizeX = 1.2 * absoThickness;
-  auto worldSizeYZ  = 1.2 * absoThickness; 
-  fworldSizeX = worldSizeX;
-  fworldSizeYZ = worldSizeYZ;
-  
   // Get materials
   auto worldMaterial = G4Material::GetMaterial("Galactic");
   auto HCALMaterial = G4Material::GetMaterial("G4_Sn");
@@ -144,97 +133,52 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
     G4Exception("CalorimeterConstruction::DefineVolumes()",
       "MyCode0001", FatalException, msg);
   }  
-   
-  //     
-  // World
-  //
-  auto worldS 
-    = new G4Box("World",           // its name
-                 worldSizeX/2, worldSizeYZ/2, worldSizeYZ/2); // its size
-                         
-  auto worldLV
-    = new G4LogicalVolume(
-                 worldS,           // its solid
-                 worldMaterial,  // its material
-                 "World");         // its name
-                                   
-  auto worldPV
-    = new G4PVPlacement(
-                 0,                // no rotation
-                 G4ThreeVector(),  // at (0,0,0)
-                 worldLV,          // its logical volume                         
-                 "World",          // its name
-                 0,                // its mother  volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
+
   
-  //                               
-  // Calorimeters (absorbers)
-  //  
-  // =========== ECAL ============
-  auto ECAL
-    = new G4Box("ECAL",     // its name
-                 ecalSizeXY/2, ecalSizeXY/2, ecalSizeXY/2); // its size
-                         
-  auto ECALLV
-    = new G4LogicalVolume(
-                 ECAL,    // its solid
-                 ECALMaterial, // its material
-                 "ECAL");  // its name
-                                   
-  new G4PVPlacement(
-                 0,                // no rotation
-                 G4ThreeVector(),  // at (0,0,0)
-                 ECALLV,          // its logical volume                         
-                 "ECAL",    // its name
-                 worldLV,          // its mother  volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
+
+  G4double PI = pi;
+  // Define the world solid
+  G4Sphere* worldS = new G4Sphere("World", innerRadius, outerRadius, 0, 2*PI, 0., PI);  
+  G4LogicalVolume * worldLV = new G4LogicalVolume(worldS, worldMaterial, "World", 0, 0 ,0);
+  G4VPhysicalVolume* worldPV = new G4PVPlacement(nullptr, 
+                                                       G4ThreeVector(0.0, 0.0, 0.0),
+                                                       worldLV,
+                                                       "World",
+                                                       nullptr,
+                                                       false, 
+                                                       0);
   
+  G4Sphere* ECAL = new G4Sphere("ECAL", 1.0*cm, 6.0*cm, 0, 2*PI, 0., PI);                 
+  G4LogicalVolume * ECALLV = new G4LogicalVolume(ECAL, ECALMaterial, "ECAL", 0, 0 ,0);
+  new G4PVPlacement(nullptr, 
+                    G4ThreeVector(0.0, 0.0, 0.0),
+                    ECALLV,
+                    "ECAL",
+                    worldLV,
+                    false, 
+                    0);
   
-  // =========== ECAL ============
-  auto HCAL
-    = new G4Box("HCAL",     // its name
-                 hcalSizeXY/2, hcalSizeXY/2, hcalSizeXY/2); // its size
-                         
-  auto HCALLV
-    = new G4LogicalVolume(
-                 HCAL,    // its solid
-                 HCALMaterial, // its material
-                 "HCAL");  // its name
-                                   
-  new G4PVPlacement(
-                 0,                // no rotation
-                 G4ThreeVector(),  // at (0,0,0)
-                 HCALLV,          // its logical volume                         
-                 "HCAL",    // its name
-                 worldLV,          // its mother  volume
-                 false,            // no boolean operation
-                 0,                // copy number
-                 fCheckOverlaps);  // checking overlaps 
-  //
-  // print parameters
-  //
-  G4cout
-    << G4endl 
-    << "------------------------------------------------------------" << G4endl
-    << "---> The calorimeter is " << nofLayers << " layers of:  " << G4endl
-    << ECALthickness/mm << "mm of " << ECALMaterial->GetName()  
-    << " and " 
-    << HCALthickness/mm << "mm of " << HCALMaterial->GetName() << G4endl
-    << "------------------------------------------------------------" << G4endl;
-  
+  G4Sphere* HCAL = new G4Sphere("HCAL", 6.0*cm, 15.0*cm, 0, 2*PI, 0., PI);  
+  G4LogicalVolume * HCALLV = new G4LogicalVolume(HCAL, HCALMaterial, "HCAL", 0, 0 ,0);
+  new G4PVPlacement(nullptr, 
+                    G4ThreeVector(0.0, 0.0, 0.0),
+                    HCALLV,
+                    "HCAL",
+                    worldLV,
+                    false, 
+                    0);
+
   //                                        
   // Visualization attributes
   //
-  worldLV->SetVisAttributes (G4VisAttributes::GetInvisible());
-
-  auto simpleBoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-  simpleBoxVisAtt->SetVisibility(true);
-  ECALLV->SetVisAttributes(simpleBoxVisAtt);
-  HCALLV->SetVisAttributes(simpleBoxVisAtt);
+  
+  worldLV->SetVisAttributes(G4Colour(0.0, 0.0, 1.0));
+  auto simpleBoxVisAtt_ECAL= new G4VisAttributes(G4Colour(1.0, 0.0, 0.0));
+  auto simpleBoxVisAtt_HCAL= new G4VisAttributes(G4Colour(0.0, 1.0, 0.0));
+  simpleBoxVisAtt_ECAL->SetVisibility(true);
+  simpleBoxVisAtt_HCAL->SetVisibility(true);
+  ECALLV->SetVisAttributes(simpleBoxVisAtt_ECAL);
+  HCALLV->SetVisAttributes(simpleBoxVisAtt_HCAL);
 
   //
   // Always return the physical World
