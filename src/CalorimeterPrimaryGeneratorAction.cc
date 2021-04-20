@@ -76,31 +76,10 @@ void CalorimeterPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   // on DetectorConstruction class we get world volume 
   // from G4LogicalVolumeStore
   //
-  G4double worldInnerRadius = 0.;
-  
-  auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
-
-  // Check that the world volume has box shape
-  G4Sphere* worldSphere = nullptr;
-  if (  worldLV ) {
-    worldSphere = dynamic_cast<G4Sphere*>(worldLV->GetSolid());
-  }
-
-  if ( worldSphere ) {
-    worldInnerRadius = worldSphere->GetInnerRadius();  
-  }
-  else  {
-    G4ExceptionDescription msg;
-    msg << "World volume of box shape not found." << G4endl;
-    msg << "Perhaps you have changed geometry." << G4endl;
-    msg << "The gun will be place in the center.";
-    G4Exception("B4PrimaryGeneratorAction::GeneratePrimaries()",
-      "MyCode0002", JustWarning, msg);
-  } 
   
   // Set gun position
   fParticleGun
-    ->SetParticlePosition(G4ThreeVector(worldInnerRadius, 0., 0.));
+    ->SetParticlePosition(G4ThreeVector(0, 0., 0.));
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
