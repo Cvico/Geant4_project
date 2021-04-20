@@ -28,39 +28,40 @@
 template <typename manager>
 void loadPhysicsList(manager* runManager);
 template <typename manager>
-void runSimulation(manager* runManager, int useDetector, int argc, char** argv);
+void runSimulation(manager* runManager, int useDetector, int argc, char** argv, std::string visType);
 
 
 int main(int argc, char** argv){
     // ---
     // Detector = 1 --> Meroli's
     // Detector = 2 --> Calorimeters
-    int useDetector = 1;
+    std::string visType = "tcsh";
+    int useDetector = 2;
     bool useMultithread = true;
-    int nThreads = 9;
+    int nThreads = 8;
 
     if (useMultithread){
         G4MTRunManager* runManager = new G4MTRunManager; 
         runManager->SetNumberOfThreads(nThreads);
-        runSimulation(runManager, useDetector, argc, argv);
+        runSimulation(runManager, useDetector, argc, argv, visType);
         }
 
     else{ 
         G4RunManager* runManager = new G4RunManager;
-        runSimulation(runManager, useDetector, argc, argv);
+        runSimulation(runManager, useDetector, argc, argv, visType);
         }
     
 }
 
 template <typename manager>
-void runSimulation(manager* runManager, int useDetector, int argc, char** argv){
+void runSimulation(manager* runManager, int useDetector, int argc, char** argv, std::string visType){
     // Choose the random engine:
     CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
     
     // Detect interactive mode (if no arguments) and define UI: 
     G4UIExecutive* ui=0;
     if (argc == 1 ){
-        ui = new G4UIExecutive(argc, argv, "tcsh");
+        ui = new G4UIExecutive(argc, argv, visType);
     }
 
     if ( useDetector == 1){ 
@@ -71,6 +72,7 @@ void runSimulation(manager* runManager, int useDetector, int argc, char** argv){
         } else { 
         CalorimeterConstruction* detector = new CalorimeterConstruction(); 
         runManager->SetUserInitialization( detector );
+        loadPhysicsList(runManager);    
         runManager->SetUserInitialization( new CalorimeterActionInitialization() );
         }
     
