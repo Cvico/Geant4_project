@@ -85,19 +85,18 @@ G4VPhysicalVolume* CalorimeterConstruction::Construct()
 
 void CalorimeterConstruction::DefineMaterials()
 { 
-  // Lead material defined using NIST Manager
-
-
-  // Use tin for CMS' HCAL
-  auto nistManager = G4NistManager::Instance();
-  nistManager->FindOrBuildMaterial("G4_Sn");
   
   // Liquid argon material
   G4double a;  // mass of a mole;
   G4double z;  // z=mean number of protons;  
   G4double density; 
+
+  G4Material* Brass = new G4Material("Brass", 8.73*g/cm3, 2 );
+  Brass->AddElement(new G4Element("Copper", "Cu", 29.0, 63.6*CLHEP::g/CLHEP::mole), 2);
+  //Brass->AddElement(new G4Element("Copper", "Cu", 29.0, 63.6*CLHEP::g/CLHEP::mole), 1);
+  Brass->AddElement(new G4Element("Zinc", "Zn", 30.0, 65.4*CLHEP::g/CLHEP::mole), 1);
+
   G4Material* PbWO4 = new G4Material("PbWO4", density= 8.28*g/cm3, 3);
-  
   // Define lead tungstate to simulate CMS' ECAL
   PbWO4->AddElement(new G4Element("Lead", "Pb",  82.0, 207.2*CLHEP::g/CLHEP::mole), 1);
   PbWO4->AddElement(new G4Element("Wolframium", "W", 74.0, 183.84*CLHEP::g/CLHEP::mole), 1);
@@ -124,7 +123,7 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
 
   // Get materials
   auto worldMaterial = G4Material::GetMaterial("Galactic");
-  auto HCALMaterial = G4Material::GetMaterial("G4_Sn");
+  auto HCALMaterial = G4Material::GetMaterial("Brass");
   auto ECALMaterial = G4Material::GetMaterial("PbWO4");
   
   if ( ! worldMaterial || ! HCALMaterial || ! ECALMaterial ) {
@@ -138,7 +137,7 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
 
   G4double PI = pi;
   // Define the world solid
-  G4Sphere* worldS = new G4Sphere("World", innerRadius, outerRadius, 0, 2*PI, 0., PI);  
+  G4Tubs* worldS = new G4Tubs("World", innerRadius, outerRadius, 30*cm, 0, 2*PI);  
   G4LogicalVolume * worldLV = new G4LogicalVolume(worldS, worldMaterial, "World", 0, 0 ,0);
   G4VPhysicalVolume* worldPV = new G4PVPlacement(nullptr, 
                                                        G4ThreeVector(0.0, 0.0, 0.0),
@@ -148,7 +147,7 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
                                                        false, 
                                                        0);
   
-  G4Sphere* ECAL = new G4Sphere("ECAL", 2.0*cm, 6.0*cm, 0, 2*PI, 0., PI);                 
+  G4Tubs* ECAL = new G4Tubs("ECAL", 2.0*cm, 12.0*cm,  30*cm, 0, 2*PI);   
   G4LogicalVolume * ECALLV = new G4LogicalVolume(ECAL, ECALMaterial, "ECAL", 0, 0 ,0);
   new G4PVPlacement(nullptr, 
                     G4ThreeVector(0.0, 0.0, 0.0),
@@ -158,7 +157,7 @@ G4VPhysicalVolume* CalorimeterConstruction::DefineVolumes()
                     false, 
                     0);
   
-  G4Sphere* HCAL = new G4Sphere("HCAL", 6.0*cm, 15.0*cm, 0, 2*PI, 0., PI);  
+  G4Tubs* HCAL = new G4Tubs("HCAL", 12.0*cm, 25.0*cm,  30*cm, 0, 2*PI);  
   G4LogicalVolume * HCALLV = new G4LogicalVolume(HCAL, HCALMaterial, "HCAL", 0, 0 ,0);
   new G4PVPlacement(nullptr, 
                     G4ThreeVector(0.0, 0.0, 0.0),
