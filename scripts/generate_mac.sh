@@ -12,13 +12,13 @@ MATERIAL=$1
 THICKNESS=$2
 ENERGY=$3
 PARTICLE=$4
-OUTPATH=$5
 
 TEMPLATE="template.mac"
 
 # Some naming conventions
 
 if [[ $MATERIAL == "silicon" ]]; then MATERIALNAME="G4_Si"; fi
+if [[ $MATERIAL == "copper" ]]; then MATERIALNAME="G4_Cu"; fi
 if [[ $MATERIAL == "argon" ]]; then MATERIALNAME="G4_Ar"; fi
 if [[ $MATERIAL == "aluminum" ]]; then MATERIALNAME="G4_Al"; fi
 if [[ $MATERIAL == "iron" ]]; then MATERIALNAME="G4_Fe"; fi
@@ -26,6 +26,7 @@ if [[ $MATERIAL == "lAr" ]]; then MATERIALNAME="G4_lAr"; fi
 if [[ $MATERIAL == "lead" ]]; then MATERIALNAME="G4_Pb"; fi
 
 if [[ $PARTICLE == "e" ]];then PARTICLENAME="electron"; fi
+if [[ $PARTICLE == "g" ]];then PARTICLENAME="gamma"; fi
 if [[ $PARTICLE == "proton" ]];then PARTICLENAME="proton"; fi
 if [[ $PARTICLE == "mu" ]];then PARTICLENAME="muon"; fi
 
@@ -59,7 +60,6 @@ cat $FILENAME | sed -e "s/5.6 um/$THICKNESSVAL $THICKNESSUNIT/" > temp.mac | mv 
 
 # Change Energy of the gun of particles
 cat $FILENAME | sed -e "s/100 MeV/$ENERGYVAL $UNIT/" > temp.mac | mv temp.mac $FILENAME
-
 
 
 ## Change the Particle that is being studied
