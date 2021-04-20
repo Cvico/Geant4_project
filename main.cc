@@ -36,8 +36,8 @@ int main(int argc, char** argv){
     // Detector = 1 --> Meroli's
     // Detector = 2 --> Calorimeters
     std::string visType = "tcsh";
-    int useDetector = 2;
-    bool useMultithread = true;
+    int useDetector = 1;
+    bool useMultithread = false;
     int nThreads = 8;
 
     if (useMultithread){
