@@ -60,9 +60,12 @@ def create_legend():
 
 
 def draw_histos(env_variables):
-    if env_variables["exercise"] == "1": draw_meroli_comp(env_variables)
+    if env_variables["exercise"] == "1": 
+        draw_meroli_comp(env_variables)
+        draw_templates(env_variables)
     if env_variables["exercise"] == "2": draw_histos_ex2(env_variables)
     if env_variables["exercise"] == "3": draw_histos_ex3(env_variables)
+    if env_variables["exercise"] == "4": draw_histos_ex4(env_variables)
 
     return
 
@@ -140,7 +143,7 @@ def draw_meroli_comp(env_variables):
    ratio.GetYaxis().SetLabelSize(0.09) 
    ratio.GetXaxis().SetLabelSize(0.09) 
    ratio.GetYaxis().SetTitleSize(0.08)
-   ratio.GetXaxis().SetTitleSize(0.13)
+   ratio.GetXaxis().SetTitleSize(0.08)
    ratio.GetYaxis().SetTitleOffset(0.55)
 
    ratio.Draw("hist p")
@@ -154,10 +157,41 @@ def draw_meroli_comp(env_variables):
 
 def draw_header():
    H = r.TLatex()
-   H.SetTextSize(0.07)                                                    	 
+   H.SetTextSize(0.05)                                                    	 
    H.DrawLatexNDC(0.1, 0.91,"#font[22]{FPFE} | #font[12]{Academic}")
 
    return
+
+def draw_templates(env_variables):
+   for var in ["Edep", "trackL"]:
+      histos  = [ deepcopy(env_variables["histograms"][key][var].Clone(key)) for key in env_variables["histograms"].keys() if key != "Meroli"]
+   
+      outpath = env_variables["outpath"]
+      make_path(outpath)
+   
+      c = create_canvas("ex1_templates_%s"%var)
+      
+      for h in histos:
+         h.Draw("hist") 
+
+         title = "Deposited energy" if var == "Edep" else "Track length"
+         h.SetLineWidth(3) 
+         h.GetXaxis().SetRangeUser(0, 60)
+         h.SetMinimum(0)
+         h.SetLineColor(r.kBlack)
+         h.SetTitle(title)
+         h.GetXaxis().SetTitle("E (keV)")
+         h.GetYaxis().SetTitle("Events")
+         h.GetYaxis().SetTitleOffset(1.3)
+         h.GetYaxis().SetLabelSize(0.03)
+         h.GetXaxis().SetLabelSize(0.03)
+         
+#      draw_header()
+   
+      c.Print(outpath + "/%s.png"%( "template_%s"%var), 'png') 
+      c.Print(outpath + "/%s.pdf"%( "electron_%s"%var ), 'pdf')
+   return
+
 
 def draw_histos_ex2(env_variables):
    histos  = [ deepcopy(env_variables["histograms"][key]["Edep"].Clone(key)) for key in env_variables["histograms"].keys() ]
@@ -203,48 +237,30 @@ def draw_histos_ex2(env_variables):
    return
 
 def draw_histos_ex3(env_variables):
-   histos  = [ deepcopy(env_variables["histograms"][key]["Edep"].Clone(key)) for key in env_variables["histograms"].keys() ]
-#   histos  = [ deepcopy(env_variables["histograms"][key]["trackL"].Clone(key)) for key in env_variables["histograms"].keys() ]
-
+   histos = env_variables["histograms"]
+   samples = histos.keys()
 
    outpath = env_variables["outpath"]
    make_path(outpath)
-
-   c = create_canvas("ex3")
-   l = create_legend()
-
    
-   for index, h in enumerate(histos):
+   for var in ["Eecal", "Ehcal"]:
+   #   c = create_canvas("ex3_%s"%var)
+  #    l = create_legend()
+      for index, h in enumerate(histos):
+         filelist = re.match("(.*)_(.*)", h).groups()
+         part = filelist[0]
+         energyval = filelist[1][:-3]
+         energyunit = filelist[1].split(energyval)[1]
 
-      filelist = re.match("(.*)_(.*)_(.*)_(.*)", h.GetName()).groups()
-      material = filelist[0]
-      thickness =  filelist[1].replace("p", ".")
+         #print(h, part, energyval, energyunit)
+         h = histos[h][var]
+         print(h)
 
-#      h.Scale(1.0/(h.Integral()))
-      
-      color = index+1 if index not in [0, 5, 10] else index+1 
-      h.Draw("hist same")
-            
-#      h.SetMaximum(0.5)  
-      h.SetLineWidth(3) 
-      h.SetMinimum(0)
-      h.SetLineColor(color)
-      h.SetTitle("")
-      h.GetXaxis().SetTitle("E (MeV)/cm")
-      h.GetYaxis().SetTitle("Normalized Events")
-      h.GetYaxis().SetTitleOffset(1.3)
-      h.GetYaxis().SetLabelSize(0.03)
-      h.GetXaxis().SetLabelSize(0.03)
 
-      entryName = " %s "%material
-      
-      l.AddEntry(h, entryName, "l")
 
-   draw_header()
-   l.Draw("same") 
-
-   c.Print(outpath + "/%s.png"%( "%s"%material ), 'png') 
-   c.Print(outpath + "/%s.pdf"%( "%s"%material ), 'pdf')
+         
+#      c.Print(outpath + "/%s.png"%( "%s"%material ), 'png') 
+ #     c.Print(outpath + "/%s.pdf"%( "%s"%material ), 'pdf')
    return
 
 

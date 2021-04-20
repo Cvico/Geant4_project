@@ -8,40 +8,6 @@ env_variables = { "matching" : "(.*):(.*);(.*),(.*)" }
 
 
 
-def create_histos():
-    # Read the txt file containing this information
-    txt_name = "./experiment/g4plots.txt"
-    f = open(txt_name)
-    lines = [ re.match(env_variables["matching"], line.replace(" ", "")).groups() for line in f.readlines() if ("#" not in line[0] and line!="" and line!="\n") ]
-    hists_to_fill = {}
-    for line in lines:
-	processed_line = line[1].replace("[", "").replace("]", "").split(",") 
-	nbins = int(processed_line[0])
-	xlow  = float(processed_line[1])
-	xup   = float(processed_line[2])
-	hists_to_fill[line[0]] = r.TH1D(line[0],"", nbins, xlow, xup)
-    f.close()
-    env_variables["hists_to_fill"] = hists_to_fill
-    return 
-
-def fill_histos(var):
-    histos  = env_variables["histograms"]
-    samples = env_variables["histograms"].keys()
-    env_variables["ret_histograms"] = {}
-
-    for index, s in enumerate(samples):
-
-        forCopy = deepcopy(env_variables["hists_to_fill"][var].Clone("%s_%s_toFill"%(var, s)))
-        h = histos[s][var] if s != "Meroli" else histos[s]
-	
-	for bini in range(1, h.GetNbinsX()+1):
-		forCopy.Fill(h.GetBinCenter(bini), h.GetBinContent(bini))
-       
-	 # Store a copy
-	env_variables["ret_histograms"][s] = deepcopy(forCopy.Clone("%s_%s"%(var, s)))
-	del forCopy
-
-    return
 
 def fit_meroli(fitType):
 
@@ -77,7 +43,7 @@ def fit_meroli(fitType):
        fitFCN.SetParameters(p0_init, p1_init, p2_init)
 
     fitResult = mer.Fit(fitType, "BS", "", xmin, xmax )
-    fitResult = mer.Fit(fitFCN, "B", "", xmin, xmax )
+#    fitResult = mer.Fit(fitFCN, "B", "", xmin, xmax )
 
     fits = [mer.GetFunction(fitType).GetParameter(i) for i in range(0, nPars)]
     return (fitFCN, fits)
@@ -99,9 +65,6 @@ def run_exercise(exercise):
 	env_variables["fitFuncs"]["Gaussn"] = fit_meroli("gausn")
 	env_variables["fitFuncs"]["convolved"] = fit_meroli("convolved")
 
-#    if exercise == "2":
- #       create_histos()
-#	fill_histos("Edep")
 
     return 
 
@@ -131,11 +94,15 @@ def get_histo_meroli():
 def get_histograms(rfile):
     
     f = r.TFile.Open(rfile)
-    histos = f.Get("histograms")
-    ret_histos = { key.GetName() : #hist_name  
-         deepcopy(histos.Get(key.GetName())) for key in histos.GetListOfKeys() }
+    
+    if env_variables["exercise"] == "3": # different tree structure for exercise3
+        ret_histos = {key.GetName() : #hist_name  
+                      deepcopy(f.Get(key.GetName())) for key in f.GetListOfKeys() if key.GetName() != "B4"}
+    else:
+        histos = f.Get("histograms")
+        ret_histos = { key.GetName() : #hist_name  
+                       deepcopy(histos.Get(key.GetName())) for key in histos.GetListOfKeys() }
     f.Close()
-    del f
     return ret_histos
 
 def set_histograms_dict(rfiles):
