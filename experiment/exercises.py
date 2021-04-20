@@ -14,6 +14,7 @@ def fit_meroli(fitType):
     mer = env_variables["histograms"]["Meroli"]
     xmin, xmax = mer.GetXaxis().GetXmin(), mer.GetXaxis().GetXmax() 
     p0_init = max(mer.GetY())/2.0
+    
     if fitType == "convolved":
        nPars = 5
 
@@ -43,7 +44,6 @@ def fit_meroli(fitType):
        fitFCN.SetParameters(p0_init, p1_init, p2_init)
 
     fitResult = mer.Fit(fitType, "BS", "", xmin, xmax )
-#    fitResult = mer.Fit(fitFCN, "B", "", xmin, xmax )
 
     fits = [mer.GetFunction(fitType).GetParameter(i) for i in range(0, nPars)]
     return (fitFCN, fits)

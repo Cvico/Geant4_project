@@ -50,11 +50,15 @@ def create_canvas(name, nPads = 1):
     return c
 
 
-def create_legend():
-    fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize = get_dims("legend")
+def create_legend(args = None):
+    if args == None:
+      fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize = get_dims("legend")
+    else:
+      fLegX1, fLegY1, fLegX2, fLegY2, legendTextSize = args
+
     l = r.TLegend(fLegX1, fLegY1, fLegX2, fLegY2)
     l.SetBorderSize(0)
-    l.SetFillColor(10)
+    l.SetFillColorAlpha(0, 0)
     l.SetTextSize(legendTextSize)
     return l
 
@@ -88,7 +92,6 @@ def draw_meroli_comp(env_variables):
 
    fitFCN_conv.SetLineColor(r.kOrange+8)
    fitFCN_conv.SetLineStyle(9)
-
    fitFCN_landau, fits_landau = env_variables["fitFuncs"]["Landau"]
    fitFCN_landau.SetParameters(fits_landau[0], fits_landau[1], fits_landau[2])
 
@@ -99,9 +102,9 @@ def draw_meroli_comp(env_variables):
 
    meroli_gr.Draw("la") 
    sim.Draw("hist same")
-
    fitFCN_conv.Draw("l same")
    fitFCN_landau.Draw("l same")
+
    sim.SetLineColor(r.kAzure+2)
    sim.SetLineWidth(3) 
    sim.Scale(meroli_gr.Integral()/sim.Integral(), "width")
@@ -127,7 +130,7 @@ def draw_meroli_comp(env_variables):
    l.Draw("same")
 
    draw_header()   
-
+   
    p2.cd()
    ratio = deepcopy(sim.Clone("ratioHist"))
    for bini in range(1, ratio.GetNbinsX()+1):
@@ -150,6 +153,7 @@ def draw_meroli_comp(env_variables):
    ratio.SetMarkerSize(1)
 
    make_path(outpath)
+   p1.cd()
    c.Print(outpath + "/%s.png"%( "Meroli_comp"), 'png') 
    c.Print(outpath + "/%s.pdf"%( "Meroli_comp" ), 'pdf')
 
@@ -242,25 +246,88 @@ def draw_histos_ex3(env_variables):
 
    outpath = env_variables["outpath"]
    make_path(outpath)
-   
+   linestyle = {"100MeV": 1, "10GeV": 8, "1GeV": 9}
+   colors = {"electrons": r.kAzure + 1, "photons": r.kViolet -7, "pions":r.kOrange - 2}
+   forLegend1 = {"100MeV": r.TH1D("100MeV", "", 1, 0, 1), "10GeV": r.TH1D("10GeV", "", 1, 0, 1), "1GeV": r.TH1D("1GeV", "", 1, 0, 1)}
+   forLegend2 = {"electrons": r.TH1D("electrons", "", 1, 0, 1), "photons": r.TH1D("photons", "", 1, 0, 1), "pions": r.TH1D("pions", "", 1, 0, 1)}
+   # Modify legend entries
+   for entry in ["100MeV", "10GeV", "1GeV"]:
+      forLegend1[entry].SetLineStyle(linestyle[entry])
+      forLegend1[entry].SetLineWidth(3)
+      forLegend1[entry].SetLineColor(1)
+   for entry in ["electrons", "photons", "pions"]:
+      forLegend2[entry].SetLineWidth(3)
+      forLegend2[entry].SetLineColor(colors[entry])
+
    for var in ["Eecal", "Ehcal"]:
-   #   c = create_canvas("ex3_%s"%var)
-  #    l = create_legend()
+      c = create_canvas("ex3_%s"%var)
+      l = create_legend( (0.45, 0.89, 0.91, 0.97, 0.035)  )
+      l.SetNColumns(3)
+      l2 = create_legend( (0.55, 0.69, 0.89, 0.89, 0.05) )
+
       for index, h in enumerate(histos):
          filelist = re.match("(.*)_(.*)", h).groups()
          part = filelist[0]
+         
          energyval = filelist[1][:-3]
          energyunit = filelist[1].split(energyval)[1]
-
+         
          #print(h, part, energyval, energyunit)
          h = histos[h][var]
-         print(h)
+         #h.Scale(1.0/(h.Integral()))
+      
+         if part == "pions" and filelist[1] == "10GeV": 
+            c1 = create_canvas("ex3_%s_pions10GeV"%var)
 
+            h.Draw("hist")
+            h.SetLineWidth(3)
+            h.SetLineStyle(linestyle[filelist[1]]) 
+            #h.SetMinimum(0)
+            h.SetLineColor(colors[part])
+            h.SetTitle("#pi^{-} at 10 GeV")
+            h.GetXaxis().SetTitle("E (keV)")
+            h.GetYaxis().SetTitle("Events")
+            h.GetYaxis().SetTitleOffset(1.3)
+            h.GetYaxis().SetLabelSize(0.03)
+            h.GetXaxis().SetLabelSize(0.03)
+            
+            draw_header()
+            h.SetLineColor(colors[part])
+            c1.Print(outpath + "/pions10GeV_%s.png"%var, 'png') 
+            c1.Print(outpath + "/pions10GeV%s.pdf"%var, 'pdf')      
+            del c1
+            continue
 
-
+         color = index+1 if index not in [0, 5, 10] else index+1 
          
-#      c.Print(outpath + "/%s.png"%( "%s"%material ), 'png') 
- #     c.Print(outpath + "/%s.pdf"%( "%s"%material ), 'pdf')
+         h.Draw("hist same")
+         if filelist[1] == "10GeV": h.Scale(10)
+         #h.SetMaximum(0.2)  
+         h.SetLineWidth(3)
+         h.SetLineStyle(linestyle[filelist[1]]) 
+         #h.SetMinimum(0)
+         h.SetLineColor(colors[part])
+         h.SetTitle("")
+         h.GetXaxis().SetTitle("E (keV)")
+         h.GetYaxis().SetTitle("Events")
+         h.GetYaxis().SetTitleOffset(1.3)
+         h.GetYaxis().SetLabelSize(0.03)
+         h.GetXaxis().SetLabelSize(0.03)
+
+         h.SetLineColor(colors[part])
+      
+      l.AddEntry(forLegend1["100MeV"], "100 MeV", "l")
+      l.AddEntry(forLegend1["1GeV"], "1 GeV", "l")
+      l.AddEntry(forLegend1["10GeV"], "(10 GeV) x 10 ", "l")
+      l.Draw("same")   
+      l2.AddEntry(forLegend2["photons"], "e^{-}", "l")
+      l2.AddEntry(forLegend2["electrons"], "#gamma", "l")
+      l2.AddEntry(forLegend2["pions"], "#pi^{-}", "l")
+      l2.Draw("same")   
+      draw_header()
+      #l2.Draw("same")
+      c.Print(outpath + "/%s.png"%( "%s"%(var) ), 'png') 
+      c.Print(outpath + "/%s.pdf"%( "%s"%(var) ), 'pdf')
    return
 
 
