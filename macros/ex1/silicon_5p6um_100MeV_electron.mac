@@ -21,7 +21,7 @@
 # set the target material to match the experimental one: Silicon
 /App/det/setTargetMaterial G4_Si
 
-/analysis/h1/set 0 124 0.00 6 keV
+/analysis/h1/set 0 124 0.00 20 keV
 # ------------------------------------------------------------------------------
 # initialization of the Run 
 /run/initialize

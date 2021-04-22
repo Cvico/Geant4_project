@@ -21,7 +21,7 @@ def fit_meroli(fitType):
        p1_init = 0.9
        p2_init = 0.3
        p3_init = 2.56 
-       p4_init = 0.9 
+       p4_init = 1.0 
        
        fitFCN_conv = r.TF1Convolution("landau", "gausn", xmin, xmax, True)
        fitFCN_conv.SetRange(xmin, xmax)
@@ -32,10 +32,10 @@ def fit_meroli(fitType):
     if fitType == "landau":   
        nPars = 3
        p1_init = 2.56 
-       p2_init = 0.9 
+       p2_init = 1.0
        fitFCN = r.TF1(fitType, fitType, xmin, xmax) 
        fitFCN.SetParameters(p0_init, p1_init, p2_init)
-
+       fitFCN.SetLineColor(r.kTeal+5)
     if fitType == "gausn":
        nPars = 3
        p1_init = 1.0
@@ -43,7 +43,7 @@ def fit_meroli(fitType):
        fitFCN = r.TF1(fitType, fitType, xmin, xmax) 
        fitFCN.SetParameters(p0_init, p1_init, p2_init)
 
-    fitResult = mer.Fit(fitType, "BS", "", xmin, xmax )
+    fitResult = mer.Fit(fitType, "BS+", "", xmin, xmax )
 
     fits = [mer.GetFunction(fitType).GetParameter(i) for i in range(0, nPars)]
     return (fitFCN, fits)
@@ -62,11 +62,29 @@ def run_exercise(exercise):
     if exercise == "1":
 	env_variables["histograms"]["Meroli"] = get_histo_meroli() 	
         env_variables["fitFuncs"]["Landau"] = fit_meroli("landau")
-	env_variables["fitFuncs"]["Gaussn"] = fit_meroli("gausn")
+	#env_variables["fitFuncs"]["Gaussn"] = fit_meroli("gausn")
 	env_variables["fitFuncs"]["convolved"] = fit_meroli("convolved")
 
-
+    if exercise == "3":
+       env_variables["ret_histograms"] = normalize_x_axis()
     return 
+def normalize_x_axis():
+    histos = env_variables["histograms"]
+    ret = {}
+    samples = histos.keys()
+    for s in samples:
+        E0 = float(re.match("(.*)_(.*)", s).groups()[1][:-3])
+        part = re.match("(.*)_(.*)", s).groups()[0]
+        ret[s] = {}
+        hs = histos[s]
+        for histo in ["Eecal", "Ehcal"]:
+            h = hs[histo]
+            hret = r.TH1D(h.GetName()+"_%s_%3.3f_normalizedXaxis"%(part,E0), "", h.GetNbinsX(), 0, 1 )
+            for bini in range(1, h.GetNbinsX()+1):
+                hret.Fill(h.GetBinCenter(bini)/E0, h.GetBinContent(bini))
+            ret[s][histo] = hret
+
+    return ret
 
 def get_histo_meroli():
   

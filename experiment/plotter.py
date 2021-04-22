@@ -84,26 +84,18 @@ def draw_meroli_comp(env_variables):
 
    l = create_legend()
  
-   meroli_gr = env_variables["histograms"]["Meroli"]
+   meroli_gr = deepcopy(env_variables["histograms"]["Meroli"].Clone("gr_copy"))
    sim = env_variables["histograms"]["silicon_5p6um_100MeV_electron"]["Edep"] 
    
    fitFCN_conv, fits_conv = env_variables["fitFuncs"]["convolved"]
-   fitFCN_conv.SetParameters(fits_conv[0], fits_conv[1], fits_conv[2], fits_conv[3], fits_conv[4])
-
-   fitFCN_conv.SetLineColor(r.kOrange+8)
-   fitFCN_conv.SetLineStyle(9)
    fitFCN_landau, fits_landau = env_variables["fitFuncs"]["Landau"]
-   fitFCN_landau.SetParameters(fits_landau[0], fits_landau[1], fits_landau[2])
-
-   fitFCN_landau.SetLineColor(r.kTeal+5)
-   fitFCN_landau.SetLineStyle(1)
 
    p1.cd()
 
    meroli_gr.Draw("la") 
    sim.Draw("hist same")
-   fitFCN_conv.Draw("l same")
-   fitFCN_landau.Draw("l same")
+   #fitFCN_conv.Draw("l same")
+   #fitFCN_landau.Draw("l same")
 
    sim.SetLineColor(r.kAzure+2)
    sim.SetLineWidth(3) 
@@ -241,7 +233,7 @@ def draw_histos_ex2(env_variables):
    return
 
 def draw_histos_ex3(env_variables):
-   histos = env_variables["histograms"]
+   histos = env_variables["ret_histograms"]
    samples = histos.keys()
 
    outpath = env_variables["outpath"]
@@ -274,41 +266,20 @@ def draw_histos_ex3(env_variables):
          
          #print(h, part, energyval, energyunit)
          h = histos[h][var]
-         #h.Scale(1.0/(h.Integral()))
-      
-         if part == "pions" and filelist[1] == "10GeV": 
-            c1 = create_canvas("ex3_%s_pions10GeV"%var)
-
-            h.Draw("hist")
-            h.SetLineWidth(3)
-            h.SetLineStyle(linestyle[filelist[1]]) 
-            #h.SetMinimum(0)
-            h.SetLineColor(colors[part])
-            h.SetTitle("#pi^{-} at 10 GeV")
-            h.GetXaxis().SetTitle("E (keV)")
-            h.GetYaxis().SetTitle("Events")
-            h.GetYaxis().SetTitleOffset(1.3)
-            h.GetYaxis().SetLabelSize(0.03)
-            h.GetXaxis().SetLabelSize(0.03)
-            
-            draw_header()
-            h.SetLineColor(colors[part])
-            c1.Print(outpath + "/pions10GeV_%s.png"%var, 'png') 
-            c1.Print(outpath + "/pions10GeV%s.pdf"%var, 'pdf')      
-            del c1
-            continue
+     
 
          color = index+1 if index not in [0, 5, 10] else index+1 
          
          h.Draw("hist same")
-         if filelist[1] == "10GeV": h.Scale(10)
+         h.SetMaximum(2800)
+         #if filelist[1] == "10GeV": h.Scale(10)
          #h.SetMaximum(0.2)  
          h.SetLineWidth(3)
          h.SetLineStyle(linestyle[filelist[1]]) 
          #h.SetMinimum(0)
          h.SetLineColor(colors[part])
          h.SetTitle("")
-         h.GetXaxis().SetTitle("E (keV)")
+         h.GetXaxis().SetTitle("#frac{E}{E_{0}}")
          h.GetYaxis().SetTitle("Events")
          h.GetYaxis().SetTitleOffset(1.3)
          h.GetYaxis().SetLabelSize(0.03)
@@ -318,7 +289,7 @@ def draw_histos_ex3(env_variables):
       
       l.AddEntry(forLegend1["100MeV"], "100 MeV", "l")
       l.AddEntry(forLegend1["1GeV"], "1 GeV", "l")
-      l.AddEntry(forLegend1["10GeV"], "(10 GeV) x 10 ", "l")
+      l.AddEntry(forLegend1["10GeV"], "(10 GeV) ", "l")
       l.Draw("same")   
       l2.AddEntry(forLegend2["photons"], "e^{-}", "l")
       l2.AddEntry(forLegend2["electrons"], "#gamma", "l")
