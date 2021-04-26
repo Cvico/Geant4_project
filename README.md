@@ -47,8 +47,8 @@ This will take the .root files that are stored in ``experiment/inputs/`` and plo
 ``python experiment/exercise 1``
 
 ## Run CMS-replica simulation
-In main.cc change the useDetector variable and set it to 2
-**RECOMMENDED**: Allow multithreading by setting the useMultithread variable to ``true``. Also be careful with the number of cores you use. **By default, multithreading is off**. Now just run the exercise like:
+* In main.cc change the useDetector variable and set it to 2
+* **RECOMMENDED**: Allow multithreading by setting the useMultithread variable to ``true``. Be careful with the number of cores you use. **By default, multithreading is off**. Now just run the exercise like:
 
 ``sh scripts/runSim.sh 1``
 
