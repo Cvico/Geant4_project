@@ -3,7 +3,7 @@ Welcome to the Geant4 simulation framework used for the **High Energy Physics at
 
 
 ## DISCLAIMER
-I have prepared some scripts to easily reproduce what I did to obtain the results, but one can certainly run everything by hand, you just have to write the correspondant macro file, compile with make and then plot. However, the plotting macro will is specifically designed for plotting the results that appear in the experimental report.
+I have prepared some scripts to easily reproduce what I did to obtain the results, but one can certainly run everything by hand, you just have to write the correspondant macro file, compile with make and then plot. However, the plotting macro is specifically designed for plotting the results that appear in the experimental report.
 
 # How to run the code
 In the **`scripts`**  folder you can find a bash script which manages all the compilation steps for the simulation. 
