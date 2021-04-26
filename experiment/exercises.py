@@ -43,7 +43,7 @@ def fit_meroli(fitType):
        fitFCN = r.TF1(fitType, fitType, xmin, xmax) 
        fitFCN.SetParameters(p0_init, p1_init, p2_init)
 
-    fitResult = mer.Fit(fitType, "BS+", "", xmin, xmax )
+    fitResult = mer.Fit(fitType, "BSEMW+", "", xmin, xmax )
 
     fits = [mer.GetFunction(fitType).GetParameter(i) for i in range(0, nPars)]
     return (fitFCN, fits)
@@ -102,8 +102,7 @@ def get_histo_meroli():
    
    gr_data = r.TGraph(len(x_bins_data)) 
    for bini in range(len(x_bins_data)):
-	gr_data.SetPoint(bini, x_bins_data[bini], y_bins_data[bini])
-  
+        gr_data.SetPoint(bini, x_bins_data[bini], y_bins_data[bini])
    data.close()
    sim.close()
    return gr_data 
